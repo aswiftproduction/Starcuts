@@ -15,7 +15,7 @@ TopDownGame.Game.prototype = {
         //Initialize and load LineGroup
         lineGroup = this.game.add.group();
         this.generateLevelArray(sampleArray, 400, 100);
-        console.log("X Position of Element:  " + this.getLineElmtX(lineGroup,5)); //tests x pos of element at given index
+        console.log("X Position of Element:  " + this.getLineElmtX(lineGroup,4)); //tests x pos of element at given index
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.game.add.group();
