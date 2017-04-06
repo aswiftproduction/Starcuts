@@ -6,14 +6,18 @@ TopDownGame.Game = function () {
 var hasJumped = false;
 
 var lineMap = []; //associative array possibly needed to handle gaps
-
+var lineGroup;
 var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'star', 'star', 'baddie', 'star'];
 
 TopDownGame.Game.prototype = {
     create: function () {
         this.sky = this.game.add.sprite(0, 0, 'sky');
         this.sky.scale.setTo(4, 4);
-        this.generateLevelArray(sampleArray, 400, 100); //
+
+        //Initialize and load LineGroup
+        lineGroup = this.game.add.group();
+        this.generateLevelArray(sampleArray, 400, 100);
+        console.log("X Position of Element:  " + this.getLineElmtX(lineGroup,5)); //tests x pos of element at given index
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.game.add.group();
@@ -96,7 +100,6 @@ TopDownGame.Game.prototype = {
     },
     generateLevelArray: function (array, offsetFromLeft, distFromEachCell) {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
-        var lineGroup = this.game.add.group();
         for (var i = 0; i < array.length; i++) {
 
             var LineObject = lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
@@ -105,5 +108,13 @@ TopDownGame.Game.prototype = {
 
 
     },
+    getLineElmtX: function(LineGroup, index) { // Currently returns the x coord at which the sprite begins
+        //TODO add the pixel width of the sprite to get the x coord at which the sprite ends
+        var lineElement = LineGroup.children[index];
+        position = lineElement.position.x;
+
+        return position;
+    }
+
 
 };
