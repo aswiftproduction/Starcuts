@@ -5,9 +5,7 @@ starCuts.Game = function () {
 
 var hasJumped = false;
 
-var lineMap = []; //associative array possibly needed to handle gaps
-var lineGroup;
-var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'star', 'star', 'baddie', 'star'];
+var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
 starCuts.Game.prototype = {
     create: function () {
@@ -101,9 +99,13 @@ starCuts.Game.prototype = {
     generateLevelArray: function (array, offsetFromLeft, distFromEachCell) {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
         for (var i = 0; i < array.length; i++) {
-
-            var LineObject = lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
-            LineObject.scale.setTo(2,2);
+            if(!(array[i] === "blank")) {
+                var LineObject = lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
+                LineObject.scale.setTo(2, 2);
+            }
+            else {
+                continue;
+            }
         }
 
 
