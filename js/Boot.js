@@ -1,9 +1,9 @@
-var TopDownGame = TopDownGame || {};
+var starCuts = starCuts || {};
  
-TopDownGame.Boot = function(){};
+starCuts.Boot = function(){};
  
 //setting game configuration and loading the assets for the loading screen
-TopDownGame.Boot.prototype = {
+starCuts.Boot.prototype = {
   preload: function() {
     //assets we'll use in the loading screen
     this.load.image('preloadbar', 'assets/preloader-bar.png');

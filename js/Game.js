@@ -1,6 +1,6 @@
-var TopDownGame = TopDownGame || {};
+var starCuts = starCuts || {};
 //title screen
-TopDownGame.Game = function () {
+starCuts.Game = function () {
 };
 
 var hasJumped = false;
@@ -9,7 +9,7 @@ var lineMap = []; //associative array possibly needed to handle gaps
 var lineGroup;
 var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'star', 'star', 'baddie', 'star'];
 
-TopDownGame.Game.prototype = {
+starCuts.Game.prototype = {
     create: function () {
         this.sky = this.game.add.sprite(0, 0, 'sky');
         this.sky.scale.setTo(4, 4);

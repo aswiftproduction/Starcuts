@@ -1,9 +1,9 @@
-var TopDownGame = TopDownGame || {};
+var starCuts = starCuts || {};
  
-TopDownGame.game = new Phaser.Game(1280, 720, Phaser.AUTO, '');
+starCuts.game = new Phaser.Game(1280, 720, Phaser.AUTO, '');
  
-TopDownGame.game.state.add('Boot', TopDownGame.Boot);
-TopDownGame.game.state.add('Preload', TopDownGame.Preload);
-TopDownGame.game.state.add('Game', TopDownGame.Game);
+starCuts.game.state.add('Boot', starCuts.Boot);
+starCuts.game.state.add('Preload', starCuts.Preload);
+starCuts.game.state.add('Game', starCuts.Game);
  
-TopDownGame.game.state.start('Boot');
+starCuts.game.state.start('Boot');

@@ -1,9 +1,9 @@
-var TopDownGame = TopDownGame || {};
+var starCuts = starCuts || {};
  
 //loading the game assets
-TopDownGame.Preload = function(){};
+starCuts.Preload = function(){};
  
-TopDownGame.Preload.prototype = {
+starCuts.Preload.prototype = {
   preload: function() {
     //show loading screen
     this.preloadBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY + 128, 'preloadbar');
