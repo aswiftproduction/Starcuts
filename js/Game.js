@@ -8,6 +8,13 @@ var hasJumped = false;
 var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
 starCuts.Game.prototype = {
+
+    init: function(currentLevel){
+        //initiaites state with a specified level
+        this.currentLevel = currentLevel;
+    },
+
+
     create: function () {
         this.sky = this.game.add.sprite(0, 0, 'sky');
         this.sky.scale.setTo(4, 4);

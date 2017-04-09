@@ -19,6 +19,8 @@ starCuts.Preload.prototype = {
     this.game.load.image('main menu', 'assets/main menu.png');
     this.game.load.image('play game', 'assets/play game.png');
     this.game.load.image('level select', 'assets/level select.png');
+    this.game.load.image('level select menu', 'assets/level select menu.png');
+    this.game.load.image('cups', 'assets/cups.png');
   },
   create: function() {
     this.state.start('MainMenu');
