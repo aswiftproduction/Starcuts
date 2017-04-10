@@ -4,6 +4,7 @@ starCuts.Game = function () {
 };
 
 var hasJumped = false;
+var gameOver=false;
 
 var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
@@ -20,10 +21,13 @@ starCuts.Game.prototype = {
         this.sky.scale.setTo(4, 4);
 
         //Initialize and load LineGroup
-        lineGroup = this.game.add.group();
+        this.lineGroup = this.game.add.group();
+		this.lineGroup.enableBody = true;
         this.generateLevelArray(sampleArray, 400, 100);
-        console.log("X Position of Element:  " + this.getLineElmtX(lineGroup,4)); //tests x pos of element at given index
+        console.log("X Position of Element:  " + this.getLineElmtX(this.lineGroup,4)); //tests x pos of element at given index
 
+		
+		
         //  The platforms group contains the ground and the 2 ledges we can jump on
         this.platforms = this.game.add.group();
         //  We will enable physics for any object that is created in this group
@@ -37,7 +41,7 @@ starCuts.Game.prototype = {
         this.ground.body.immovable = true;
 
         // The player and its settings
-        this.player = this.game.add.sprite(48, this.game.world.height - 125, 'dude');
+        this.player = this.game.add.sprite(64, this.game.world.height - 125, 'dude');
 
         //  We need to enable physics on the player
         this.game.physics.arcade.enable(this.player);
@@ -70,10 +74,15 @@ starCuts.Game.prototype = {
         this.player.events.onDragStop.add(this.onDragStop, this);
     },
     update: function () {
-        //  Collide the player and the stars with the platforms
+		if(gameOver){
+			return;
+		}
+        //  Collide the player with the platforms
         this.hitPlatform = this.game.physics.arcade.collide(this.player, this.platforms);
+		//	Collide player with people in line
+		this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 
-        //tmp movement controls, TODO replaced with new jump later
+        //Animation controls for player
         if (this.player.body.touching.down && this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
@@ -88,26 +97,20 @@ starCuts.Game.prototype = {
             //  Move to the right
             this.player.animations.play('right');
         }
-
-
-        //  Allow the player to jump if they are touching the ground.
-        if (this.cursors.up.isDown && this.player.body.touching.down && this.hitPlatform) {
-            this.player.body.velocity.y = -350;
-        }
     },
     onDragStop: function (sprite, pointer) {
         var xdiff = sprite.position.x - pointer.x;
         var ydiff = sprite.position.y - pointer.y;
-        console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
-        sprite.body.velocity.x = 10 * xdiff;
-        sprite.body.velocity.y = 10 * ydiff;
+        //console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
+        sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
+        sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
         hasJumped = true;
     },
     generateLevelArray: function (array, offsetFromLeft, distFromEachCell) {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
         for (var i = 0; i < array.length; i++) {
             if(!(array[i] === "blank")) {
-                var LineObject = lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
+                var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
                 LineObject.scale.setTo(2, 2);
             }
             else {
@@ -123,7 +126,15 @@ starCuts.Game.prototype = {
         position = lineElement.position.x;
 
         return position;
-    }
+    },
+	hitPatron: function(player, patron){
+		console.log("you lose");
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
+		this.player.inputEnabled = false;
+		this.player.body.gravity.y = 0;
+		gameOver=true;
+	}
 
 
 };
