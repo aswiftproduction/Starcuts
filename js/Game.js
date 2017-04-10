@@ -5,7 +5,9 @@ starCuts.Game = function () {
 
 var hasJumped = false;
 var gameOver=false;
-
+var gameWon=false;
+var startWinX=1200;
+var endWinX = 1280;
 var sampleArray = ['baddie', 'blank', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
 starCuts.Game.prototype = {
@@ -75,6 +77,7 @@ starCuts.Game.prototype = {
     },
     update: function () {
 		if(gameOver){
+			this.game.input.onDown.add(this.restart, self);
 			return;
 		}
         //  Collide the player with the platforms
@@ -97,6 +100,10 @@ starCuts.Game.prototype = {
             //  Move to the right
             this.player.animations.play('right');
         }
+		
+		if(this.player.body.touching.down && !gameOver && this.player.x>=startWinX && this.player.x<=endWinX){
+			this.hasWon();
+		}
     },
     onDragStop: function (sprite, pointer) {
         var xdiff = sprite.position.x - pointer.x;
@@ -129,11 +136,32 @@ starCuts.Game.prototype = {
     },
 	hitPatron: function(player, patron){
 		console.log("you lose");
+		this.gameOverText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Game Over\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
+		this.gameOverText.anchor.setTo(0.5,0.5)
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
 		this.player.body.gravity.y = 0;
 		gameOver=true;
+	},
+	restart: function(won){
+		goToLevel=gameWon?this.currentLevel+1:this.currentLevel
+		gameOver=false;
+		gameWon=false;
+		hasJumped=false;
+		starCuts.game.state.start('Game',true,false, goToLevel);
+	},
+	hasWon: function(){
+		console.log("you win");
+		this.gameWonText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
+		this.gameWonText.anchor.setTo(0.5,0.5)
+		this.player.body.velocity.x = 0;
+		this.player.body.velocity.y = 0;
+		this.player.inputEnabled = false;
+		this.player.body.gravity.y = 0;
+		gameWon=true;
+		gameOver=true;
+		
 	}
 
 
