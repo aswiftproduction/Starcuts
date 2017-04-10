@@ -6,6 +6,9 @@ starCuts.Game = function () {
 var hasJumped = false;
 var gameOver=false;
 
+
+
+
 var sampleArray = ['baddie', 'blank', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
 starCuts.Game.prototype = {
@@ -99,8 +102,17 @@ starCuts.Game.prototype = {
         }
     },
     onDragStop: function (sprite, pointer) {
+        var lineDrawer = this.game.add.graphics(100,100);
+
+        lineDrawer.beginFill(0x21922C);
+        lineDrawer.lineStyle(10,0x21922C,1);
+        lineDrawer.moveTo(sprite.x,sprite.y);
+
+
+
         var xdiff = sprite.position.x - pointer.x;
         var ydiff = sprite.position.y - pointer.y;
+        lineDrawer.lineTo(sprite.x+xdiff,sprite.y+ydiff);
         //console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
         sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
         sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
