@@ -5,7 +5,7 @@ starCuts.Game = function () {
 
 var hasJumped = false;
 
-var sampleArray = ['baddie', 'star', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
+var sampleArray = ['baddie', 'blank', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
 starCuts.Game.prototype = {
     create: function () {
