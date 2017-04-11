@@ -8,6 +8,7 @@ var gameOver=false;
 var gameWon=false;
 var startWinX=1200;
 var endWinX = 1280;
+var lineDrawer;
 
 var sampleArray = ['baddie', 'blank', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
 
@@ -22,6 +23,10 @@ starCuts.Game.prototype = {
     create: function () {
         this.sky = this.game.add.sprite(0, 0, 'sky');
         this.sky.scale.setTo(4, 4);
+
+        lineDrawer = this.game.add.graphics(0,0);
+        lineDrawer.beginFill(0x21922C);
+        lineDrawer.lineStyle(7,0x21922C,0);
 
         //Initialize and load LineGroup
         this.lineGroup = this.game.add.group();
@@ -75,8 +80,11 @@ starCuts.Game.prototype = {
         //prevent player from actually moving
         this.player.input.setDragLock(false, false);
         this.player.events.onDragStop.add(this.onDragStop, this);
+        this.player.events.onDragUpdate.add(this.onDragUpdate,this);
     },
     update: function () {
+
+
 		if(gameOver){
 			this.game.input.onDown.add(this.restart, self);
 			return;
@@ -105,23 +113,30 @@ starCuts.Game.prototype = {
 		if(this.player.body.touching.down && !gameOver && this.player.x>=startWinX && this.player.x<=endWinX){
 			this.hasWon();
 		}
+
     },
     onDragStop: function (sprite, pointer) {
-        var lineDrawer = this.game.add.graphics(100,100);
-
-        lineDrawer.beginFill(0x21922C);
-        lineDrawer.lineStyle(10,0x21922C,1);
-        lineDrawer.moveTo(sprite.x,sprite.y);
-
-
-
+        lineDrawer.clear();
         var xdiff = sprite.position.x - pointer.x;
         var ydiff = sprite.position.y - pointer.y;
-        lineDrawer.lineTo(sprite.x+xdiff,sprite.y+ydiff);
         //console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
         sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
         sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
         hasJumped = true;
+    },
+    onDragUpdate: function (sprite,pointer) {
+        //TODO Add triangle to top of line to form arrow, then add angle calculations
+        lineDrawer.clear();
+        lineDrawer.beginFill(0x21922C);
+        lineDrawer.lineStyle(7,0x21922C,1);
+        lineDrawer.moveTo(sprite.x,sprite.y);
+        var xdiff = sprite.position.x - pointer.x;
+        var ydiff = sprite.position.y - pointer.y;
+        var xThreshhold = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
+        var yThreshhold = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
+        lineDrawer.lineTo(sprite.x+xdiff*4,sprite.y+ydiff*4);
+
+
     },
     generateLevelArray: function (array, offsetFromLeft, distFromEachCell) {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
