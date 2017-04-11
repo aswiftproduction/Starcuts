@@ -10,7 +10,7 @@ var startWinX=1200;
 var endWinX = 1280;
 var lineDrawer;
 
-var sampleArray = ['baddie', 'blank', 'baddie', 'baddie', 'blank', 'star', 'baddie', 'star'];
+var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'blank', 'pinknpc', 'blank', 'blank'];
 
 starCuts.Game.prototype = {
 
@@ -31,9 +31,8 @@ starCuts.Game.prototype = {
         //Initialize and load LineGroup
         this.lineGroup = this.game.add.group();
 		this.lineGroup.enableBody = true;
-        this.generateLevelArray(sampleArray, 400, 100);
-        console.log("X Position of Element:  " + this.getLineElmtX(this.lineGroup,4)); //tests x pos of element at given index
 
+        this.generateLevelArray(sampleArray, 400, 125);
 		
 		
         //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -51,8 +50,10 @@ starCuts.Game.prototype = {
         // The player and its settings
         this.player = this.game.add.sprite(64, this.game.world.height - 125, 'player');
 
+
         //  We need to enable physics on the player
         this.game.physics.arcade.enable(this.player);
+        this.player.body.setSize(30,56, 15,28);
 
         //set anchor of player
         this.player.anchor.setTo(0.5, 0.5);
@@ -85,6 +86,9 @@ starCuts.Game.prototype = {
 		//this.player.frame = 1;
     },
     update: function () {
+        this.game.debug.bodyInfo(this.player,80,112);
+        this.game.debug.body(this.player);
+
 
 
 		if(gameOver){
@@ -145,8 +149,8 @@ starCuts.Game.prototype = {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
         for (var i = 0; i < array.length; i++) {
             if(!(array[i] === "blank")) {
-                var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 150, array[i]);
-                LineObject.scale.setTo(2, 2);
+                var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
+                LineObject.body.setSize(80,100);
             }
             else {
                 continue;

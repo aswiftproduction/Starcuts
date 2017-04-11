@@ -21,6 +21,7 @@ starCuts.Preload.prototype = {
     this.game.load.image('level select', 'assets/level select.png');
     this.game.load.image('level select menu', 'assets/level select menu.png');
     this.game.load.image('cups', 'assets/cups.png');
+    this.game.load.image('pinknpc', 'assets/npc_pink.png');
   },
   create: function() {
     this.state.start('MainMenu');
