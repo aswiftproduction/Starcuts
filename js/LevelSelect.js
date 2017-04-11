@@ -43,13 +43,19 @@ starCuts.LevelSelect.prototype =
                 this.cup.alpha = 0.7;
 
                 //Hightlight on mouseover
-                this.cup.alpha =0.7;
-                this.cup.inputEnabled = true;
-                this.cup.events.onInputOver.add(function (){this.alpha = 1;}, this.cup);
-                this.cup.events.onInputOut.add(function(){this.alpha = 0.7;}, this.cup);
+                if (x < 3 && y == 0) {
+                    this.cup.alpha = 0.7;
+                    this.cup.inputEnabled = true;
+                    this.cup.events.onInputOver.add(function () {
+                        this.alpha = 1;
+                    }, this.cup);
+                    this.cup.events.onInputOut.add(function () {
+                        this.alpha = 0.7;
+                    }, this.cup);
 
-                //Level selection
-                this.cup.events.onInputDown.add(this.startLevel, {level:level});
+                    //Level selection
+                    this.cup.events.onInputDown.add(this.startLevel, {level: level});
+                }
 
             }
         }
