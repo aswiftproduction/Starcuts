@@ -49,7 +49,7 @@ starCuts.Game.prototype = {
         this.ground.body.immovable = true;
 
         // The player and its settings
-        this.player = this.game.add.sprite(64, this.game.world.height - 125, 'dude');
+        this.player = this.game.add.sprite(64, this.game.world.height - 125, 'player');
 
         //  We need to enable physics on the player
         this.game.physics.arcade.enable(this.player);
@@ -61,12 +61,12 @@ starCuts.Game.prototype = {
         this.player.body.bounce.y = 0.1;
         this.player.body.gravity.y = 1300;
         this.player.body.collideWorldBounds = true;
-        this.player.scale.setTo(2, 2);
+        //this.player.scale.setTo(2, 2);
 
         //  Our two animations, walking left and right.
         //TODO consider jumping/landing animations
-        this.player.animations.add('left', [0, 1, 2, 3], 10, true);
-        this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+        this.player.animations.add('crouch', [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], 24, false);
+        this.player.animations.add('fly', [26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,45,46,47,48,49], 24, true);
 
         //resizes the game world to match the layer dimensions
         //this.backgroundlayer.resizeWorld();
@@ -81,6 +81,8 @@ starCuts.Game.prototype = {
         this.player.input.setDragLock(false, false);
         this.player.events.onDragStop.add(this.onDragStop, this);
         this.player.events.onDragUpdate.add(this.onDragUpdate,this);
+		this.player.events.onDragStart.add(this.onDragStart,this);
+		//this.player.frame = 1;
     },
     update: function () {
 
@@ -98,16 +100,16 @@ starCuts.Game.prototype = {
         if (this.player.body.touching.down && this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
-            this.player.animations.stop();
-            this.player.frame = 4;
-        }
-        else if (this.player.body.velocity.x < 0) {
-            //  Move to the left
-            this.player.animations.play('left');
-        }
-        else if (this.player.body.velocity.x > 0) {
-            //  Move to the right
-            this.player.animations.play('right');
+            //this.player.animations.stop();
+			if(hasJumped && !this.game.input.mousePointer.isDown){
+				this.player.animations.stop();
+				this.player.frame = 0;
+			}else if(!this.game.input.mousePointer.isDown){
+				this.player.animations.stop();
+				this.player.frame = 1;
+			}else if(this.game.input.mousePointer.isDown){
+				//this.player.animations.play('crouch');
+			}
         }
 		
 		if(this.player.body.touching.down && !gameOver && this.player.x>=startWinX && this.player.x<=endWinX){
@@ -123,6 +125,7 @@ starCuts.Game.prototype = {
         sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
         sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
         hasJumped = true;
+		this.player.animations.play('fly');
     },
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
@@ -187,6 +190,9 @@ starCuts.Game.prototype = {
 		gameWon=true;
 		gameOver=true;
 		
+	},
+	onDragStart:function(sprite,pointer){
+		this.player.animations.play('crouch');
 	}
 
 
