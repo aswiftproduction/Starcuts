@@ -22,6 +22,9 @@ starCuts.Preload.prototype = {
     this.game.load.image('level select menu', 'assets/level select menu.png');
     this.game.load.image('cups', 'assets/cups.png');
     this.game.load.image('pinknpc', 'assets/npc_pink.png');
+    this.game.load.image('borednpc', 'assets/npc_bored.png');
+    this.game.load.image('talking_l', 'assets/npc_talking_l.png');
+    this.game.load.image('talking_r', 'assets/npc_talking_r.png');
   },
   create: function() {
     this.state.start('MainMenu');
