@@ -6,11 +6,11 @@ starCuts.Game = function () {
 var hasJumped = false;
 var gameOver=false;
 var gameWon=false;
-var startWinX=1200;
-var endWinX = 1280;
+var startWinX=1000;
+var endWinX = 1113;
 var lineDrawer;
 
-var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'blank', 'pinknpc', 'blank', 'blank'];
+var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
 
 starCuts.Game.prototype = {
 
@@ -21,8 +21,7 @@ starCuts.Game.prototype = {
 
 
     create: function () {
-        this.sky = this.game.add.sprite(0, 0, 'sky');
-        this.sky.scale.setTo(4, 4);
+        this.background = this.game.add.sprite(0, 0, 'background');
 
         lineDrawer = this.game.add.graphics(0,0);
         lineDrawer.beginFill(0x21922C);
@@ -41,11 +40,11 @@ starCuts.Game.prototype = {
         this.platforms.enableBody = true;
 
         // Here we create the ground.
-        this.ground = this.platforms.create(0, this.game.world.height - 64, 'ground');
+        this.floor = this.platforms.create(0, this.game.world.height - 64, 'floor');
         //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-        this.ground.scale.setTo(4, 4);
+        this.floor.scale.setTo(4, 4);
         //  This stops it from falling away when you jump on it
-        this.ground.body.immovable = true;
+        this.floor.body.immovable = true;
 
         // The player and its settings
         this.player = this.game.add.sprite(64, this.game.world.height - 125, 'player');
@@ -53,7 +52,7 @@ starCuts.Game.prototype = {
 
         //  We need to enable physics on the player
         this.game.physics.arcade.enable(this.player);
-        this.player.body.setSize(30,56, 15,28);
+        this.player.body.setSize(44,97, 20,13);
 
         //set anchor of player
         this.player.anchor.setTo(0.5, 0.5);
@@ -86,9 +85,19 @@ starCuts.Game.prototype = {
 		//this.player.frame = 1;
     },
     update: function () {
-        this.game.debug.bodyInfo(this.player,80,112);
-        this.game.debug.body(this.player);
 
+
+        //===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
+        // this.game.debug.bodyInfo(this.player,80,112);
+        // this.game.debug.body(this.player);
+        //
+        // for (var i = 0; i < this.lineGroup.length; i++) {
+        //
+        //     this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
+        //     this.game.debug.body(this.lineGroup.children[i]);
+        // }
+        //
+        //
 
 
 		if(gameOver){
@@ -119,6 +128,9 @@ starCuts.Game.prototype = {
 		if(this.player.body.touching.down && !gameOver && this.player.x>=startWinX && this.player.x<=endWinX){
 			this.hasWon();
 		}
+        if(this.player.body.touching.down && !gameOver && this.player.x>endWinX) {
+		    this.hitPatron(this.player,null);
+        }
 
     },
     onDragStop: function (sprite, pointer) {
@@ -134,14 +146,16 @@ starCuts.Game.prototype = {
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
         lineDrawer.clear();
-        lineDrawer.beginFill(0x21922C);
-        lineDrawer.lineStyle(7,0x21922C,1);
-        lineDrawer.moveTo(sprite.x,sprite.y);
-        var xdiff = sprite.position.x - pointer.x;
-        var ydiff = sprite.position.y - pointer.y;
-        var xThreshhold = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
-        var yThreshhold = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
-        lineDrawer.lineTo(sprite.x+xdiff*4,sprite.y+ydiff*4);
+        if(this.player.body.touching.down) {
+            lineDrawer.beginFill(0x21922C);
+            lineDrawer.lineStyle(7, 0x21922C, 1);
+            lineDrawer.moveTo(sprite.x, sprite.y);
+            var xdiff = sprite.position.x - pointer.x;
+            var ydiff = sprite.position.y - pointer.y;
+            var xThreshhold = (xdiff / Math.abs(xdiff)) * Math.min(10 * Math.abs(xdiff), 500);
+            var yThreshhold = (ydiff / Math.abs(ydiff)) * Math.min(10 * Math.abs(ydiff), 1200);
+            lineDrawer.lineTo(sprite.x + xdiff * 4, sprite.y + ydiff * 4);
+        }
 
 
     },
@@ -150,7 +164,7 @@ starCuts.Game.prototype = {
         for (var i = 0; i < array.length; i++) {
             if(!(array[i] === "blank")) {
                 var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
-                LineObject.body.setSize(80,100);
+                LineObject.body.setSize(45,90,18,10);
             }
             else {
                 continue;
@@ -169,7 +183,7 @@ starCuts.Game.prototype = {
 	hitPatron: function(player, patron){
 		console.log("you lose");
 		this.gameOverText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Game Over\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
-		this.gameOverText.anchor.setTo(0.5,0.5)
+		this.gameOverText.anchor.setTo(0.5,0.5);
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
