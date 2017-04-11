@@ -11,8 +11,8 @@ starCuts.Preload.prototype = {
     this.load.setPreloadSprite(this.preloadBar);
  
     //load game assets
-    this.game.load.image('sky', 'assets/sky.png');
-    this.game.load.image('ground', 'assets/platform.png');
+    this.game.load.image('background', 'assets/background.png');
+    this.game.load.image('floor', 'assets/floor.png');
     this.game.load.spritesheet('player', 'assets/player_sprite.png', 80, 112);
     this.game.load.spritesheet('baddie', 'assets/baddie.png', 32,32);
     this.game.load.image('star', 'assets/star.png');
