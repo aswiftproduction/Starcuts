@@ -109,7 +109,9 @@ starCuts.Game.prototype = {
         this.player.events.onDragUpdate.add(this.onDragUpdate,this);
 		this.player.events.onDragStart.add(this.onDragStart,this);
 		this.game.world.bringToTop(this.levelText);
-		//this.player.frame = 1;
+		
+		this.jumpSound=this.game.add.audio('jump');
+		this.winSound=this.game.add.audio('win');
     },
     update: function () {
 
@@ -169,6 +171,7 @@ starCuts.Game.prototype = {
         sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
         hasJumped = true;
 		this.player.animations.play('fly');
+		this.jumpSound.play();
     },
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
@@ -234,6 +237,7 @@ starCuts.Game.prototype = {
 		this.player.body.gravity.y = 0;
 		gameWon=true;
 		gameOver=true;
+		this.winSound.play();
 		
 	},
 	onDragStart:function(sprite,pointer){
