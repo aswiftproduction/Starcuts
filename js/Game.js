@@ -18,7 +18,7 @@ var enemySpacing=125
 var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
 var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
-				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank']];
+				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
 
 starCuts.Game.prototype = {
 
@@ -28,13 +28,15 @@ starCuts.Game.prototype = {
 		console.log("current level: "+this.currentLevel);
 		if(this.currentLevel>levelsArray.length || this.currentLevel<1)
 			this.state.start('MainMenu');
-		sampleArray=levelsArray[this.currentLevel-1];
+		//sampleArray=levelsArray[this.currentLevel-1];
+		this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
+		this.levelText.fixedToCamera = true;
     },
 
 
     create: function () {
         //this.background = this.game.add.sprite(0, 0, 'background');
-		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset;
+		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset+winsize;
 		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
 		this.game.world.setBounds(0, 0, worldBound, this.game.height);
 
@@ -106,6 +108,7 @@ starCuts.Game.prototype = {
         this.player.events.onDragStop.add(this.onDragStop, this);
         this.player.events.onDragUpdate.add(this.onDragUpdate,this);
 		this.player.events.onDragStart.add(this.onDragStart,this);
+		this.game.world.bringToTop(this.levelText);
 		//this.player.frame = 1;
     },
     update: function () {
