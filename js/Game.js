@@ -6,27 +6,37 @@ starCuts.Game = function () {
 var hasJumped = false;
 var gameOver=false;
 var gameWon=false;
-var startWinX=1000;
+var winsize=300
+var startWinX=1280-winsize;
 var endWinX = Number.MAX_SAFE_INTEGER;
 var lineDrawer;
+var worldBound=1280;
+var currentLevel;
+var enemyLeftOffset=400;
+var enemySpacing=125
 
 var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
+var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
+				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank']];
 
 starCuts.Game.prototype = {
 
     init: function(currentLevel){
         //initiaites state with a specified level
         this.currentLevel = currentLevel;
+		console.log("current level: "+this.currentLevel);
+		if(this.currentLevel>levelsArray.length || this.currentLevel<1)
+			this.state.start('MainMenu');
+		sampleArray=levelsArray[this.currentLevel-1];
     },
 
 
     create: function () {
-        this.background = this.game.add.sprite(0, 0, 'background');
-		
-		this.game.world.setBounds(0, 0, 3500, this.game.height);
-		/*this.grass = this.add.tileSprite(0,this.game.height-100,this.game.world.width,70,'grass');
-		this.ground = this.add.tileSprite(0,this.game.height-70,this.game.world.width,70,'ground');
-		*/
+        //this.background = this.game.add.sprite(0, 0, 'background');
+		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset;
+		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
+		this.game.world.setBounds(0, 0, worldBound, this.game.height);
 
         lineDrawer = this.game.add.graphics(0,0);
         lineDrawer.beginFill(0x21922C);
@@ -35,8 +45,9 @@ starCuts.Game.prototype = {
         //Initialize and load LineGroup
         this.lineGroup = this.game.add.group();
 		this.lineGroup.enableBody = true;
-
-        this.generateLevelArray(sampleArray, 400, 125);
+		
+		
+        this.generateLevelArray(levelsArray[this.currentLevel-1], enemyLeftOffset, enemySpacing);
 		
 		
         //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -51,10 +62,15 @@ starCuts.Game.prototype = {
         //  This stops it from falling away when you jump on it
         this.ground.body.immovable = true;
 		this.ground.body.allowGravity = false;
-
+		
+		//add lamps
+		this.drawLamps(200, 30);
+		
+		//add cashier
+		this.game.add.sprite(worldBound-170, this.game.world.height - 64-156, 'cashier');
+		
         // The player and its settings
         this.player = this.game.add.sprite(64, this.game.world.height - 125, 'player');
-
 
         //  We need to enable physics on the player
         this.game.physics.arcade.enable(this.player);
@@ -94,7 +110,6 @@ starCuts.Game.prototype = {
     },
     update: function () {
 
-
         //===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
         // this.game.debug.bodyInfo(this.player,80,112);
         // this.game.debug.body(this.player);
@@ -109,7 +124,7 @@ starCuts.Game.prototype = {
 
 
 		if(gameOver){
-			this.game.input.onDown.add(this.restart, self);
+			this.game.input.onDown.add(this.restart,this);
 			return;
 		}
         //  Collide the player with the platforms
@@ -199,8 +214,8 @@ starCuts.Game.prototype = {
 		this.player.body.gravity.y = 0;
 		gameOver=true;
 	},
-	restart: function(won){
-		goToLevel=gameWon?this.currentLevel+1:this.currentLevel
+	restart: function(self){
+		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
 		gameOver=false;
 		gameWon=false;
 		hasJumped=false;
@@ -220,6 +235,14 @@ starCuts.Game.prototype = {
 	},
 	onDragStart:function(sprite,pointer){
 		this.player.animations.play('crouch');
+	},
+	drawLamps:function(distToNext, leftOffset){
+		for(var i=0; i<=(worldBound-leftOffset)/distToNext;i++){
+			if(i%2===0)
+				this.game.add.sprite(leftOffset+(i*distToNext), 0, 'topLamp');
+			else
+				this.game.add.sprite(leftOffset+(i*distToNext), -40, 'topLamp');
+		}
 	}
 
 
