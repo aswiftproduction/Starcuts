@@ -7,7 +7,7 @@ var hasJumped = false;
 var gameOver=false;
 var gameWon=false;
 var startWinX=1000;
-var endWinX = 1113;
+var endWinX = Number.MAX_SAFE_INTEGER;
 var lineDrawer;
 
 var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
@@ -22,6 +22,11 @@ starCuts.Game.prototype = {
 
     create: function () {
         this.background = this.game.add.sprite(0, 0, 'background');
+		
+		this.game.world.setBounds(0, 0, 3500, this.game.height);
+		/*this.grass = this.add.tileSprite(0,this.game.height-100,this.game.world.width,70,'grass');
+		this.ground = this.add.tileSprite(0,this.game.height-70,this.game.world.width,70,'ground');
+		*/
 
         lineDrawer = this.game.add.graphics(0,0);
         lineDrawer.beginFill(0x21922C);
@@ -35,16 +40,17 @@ starCuts.Game.prototype = {
 		
 		
         //  The platforms group contains the ground and the 2 ledges we can jump on
-        this.platforms = this.game.add.group();
+        //this.platforms = this.game.add.group();
         //  We will enable physics for any object that is created in this group
-        this.platforms.enableBody = true;
+        //this.platforms.enableBody = true;
 
         // Here we create the ground.
-        this.floor = this.platforms.create(0, this.game.world.height - 64, 'floor');
-        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-        this.floor.scale.setTo(4, 4);
+		this.ground = this.add.tileSprite(0,this.game.height-64,this.game.world.width,0,'floor');
+		this.game.physics.arcade.enable(this.ground);
+        this.ground.enableBody = true;
         //  This stops it from falling away when you jump on it
-        this.floor.body.immovable = true;
+        this.ground.body.immovable = true;
+		this.ground.body.allowGravity = false;
 
         // The player and its settings
         this.player = this.game.add.sprite(64, this.game.world.height - 125, 'player');
@@ -62,7 +68,9 @@ starCuts.Game.prototype = {
         this.player.body.gravity.y = 1300;
         this.player.body.collideWorldBounds = true;
         //this.player.scale.setTo(2, 2);
-
+		
+		//have camera follow player
+		this.game.camera.follow(this.player);
         //  Our two animations, walking left and right.
         //TODO consider jumping/landing animations
         this.player.animations.add('crouch', [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], 24, false);
@@ -105,12 +113,13 @@ starCuts.Game.prototype = {
 			return;
 		}
         //  Collide the player with the platforms
-        this.hitPlatform = this.game.physics.arcade.collide(this.player, this.platforms);
+		//this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
+        this.hitPlatform = this.game.physics.arcade.collide(this.player, this.ground);
 		//	Collide player with people in line
 		this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 
         //Animation controls for player
-        if (this.player.body.touching.down && this.hitPlatform) {
+        if (/*this.player.body.touching.down && */this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
             //this.player.animations.stop();
@@ -125,17 +134,17 @@ starCuts.Game.prototype = {
 			}
         }
 		
-		if(this.player.body.touching.down && !gameOver && this.player.x>=startWinX && this.player.x<=endWinX){
+		if(/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x-this.game.camera.x>=startWinX && this.player.x-this.game.camera.x<=endWinX){
 			this.hasWon();
 		}
-        if(this.player.body.touching.down && !gameOver && this.player.x>endWinX) {
+        if(/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x-this.game.camera.x>endWinX) {
 		    this.hitPatron(this.player,null);
         }
 
     },
     onDragStop: function (sprite, pointer) {
         lineDrawer.clear();
-        var xdiff = sprite.position.x - pointer.x;
+        var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
         var ydiff = sprite.position.y - pointer.y;
         //console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
         sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
@@ -146,11 +155,11 @@ starCuts.Game.prototype = {
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
         lineDrawer.clear();
-        if(this.player.body.touching.down) {
+        if(this.hitPlatform) {
             lineDrawer.beginFill(0x21922C);
             lineDrawer.lineStyle(7, 0x21922C, 1);
             lineDrawer.moveTo(sprite.x, sprite.y);
-            var xdiff = sprite.position.x - pointer.x;
+            var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
             var ydiff = sprite.position.y - pointer.y;
             var xThreshhold = (xdiff / Math.abs(xdiff)) * Math.min(10 * Math.abs(xdiff), 500);
             var yThreshhold = (ydiff / Math.abs(ydiff)) * Math.min(10 * Math.abs(ydiff), 1200);
@@ -182,7 +191,7 @@ starCuts.Game.prototype = {
     },
 	hitPatron: function(player, patron){
 		console.log("you lose");
-		this.gameOverText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'Game Over\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
+		this.gameOverText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'Game Over\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameOverText.anchor.setTo(0.5,0.5);
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
@@ -199,7 +208,7 @@ starCuts.Game.prototype = {
 	},
 	hasWon: function(){
 		console.log("you win");
-		this.gameWonText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
+		this.gameWonText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameWonText.anchor.setTo(0.5,0.5)
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
