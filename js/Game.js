@@ -14,11 +14,23 @@ var worldBound=1280;
 var currentLevel;
 var enemyLeftOffset=400;
 var enemySpacing=125;
+var isInvincible=false;
+var invincibleTimer=-1;
 
 var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
 var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
 				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
+var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
+	"You don't have time to wait in line.\nJump over the patient patrons",
+	""];
+var levelJson=[{enemies:['blank'],
+                text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)"},
+               {enemies:['blank', 'blank', 'pinknpc', 'blank'],
+                text:"You don't have time to wait in line.\nJump over the patient patrons"},
+               {enemies:['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+                text:""},
+];
 
 starCuts.Game.prototype = {
 
@@ -31,6 +43,7 @@ starCuts.Game.prototype = {
 		//sampleArray=levelsArray[this.currentLevel-1];
 		this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
 		this.levelText.fixedToCamera = true;
+		this.tutorialText=this.game.add.text(16, 200, tutorialTextArray[currentLevel-1], { fontSize: '16px', fill: '#000' });
     },
 
 
@@ -113,10 +126,18 @@ starCuts.Game.prototype = {
 		
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
+<<<<<<< HEAD
 		this.bgMusic=this.game.add.audio('bgmusic');
 		this.loseSound=this.game.add.audio('oww');
 
 		this.bgMusic.play();
+=======
+		
+		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
+		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
+		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
+		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+>>>>>>> c39f4074a0e6df51683e02c86163f716cb415fb8
     },
     update: function () {
 
@@ -131,8 +152,19 @@ starCuts.Game.prototype = {
         // }
         //
         //
-
-
+		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);},this);
+		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);},this);
+		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);},this);
+		
+		invincibleTimer=(invincibleTimer>0)?invincibleTimer-1:-1;
+		if(invincibleTimer<=0)
+			spacebar.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
+		if(isInvincible)
+			this.lineGroup.alpha=0.5;
+		else
+			this.lineGroup.alpha=1;
+		
+		
 		if(gameOver){
 			this.game.input.onDown.add(this.restart,this);
 			return;
@@ -141,7 +173,8 @@ starCuts.Game.prototype = {
 		//this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
         this.hitPlatform = this.game.physics.arcade.collide(this.player, this.ground);
 		//	Collide player with people in line
-		this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
+		if(!isInvincible)
+			this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 
         //Animation controls for player
         if (/*this.player.body.touching.down && */this.hitPlatform) {
