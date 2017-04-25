@@ -44,7 +44,7 @@ starCuts.MainMenu.prototype = {
     },
 
     startGame: function () {
-        starCuts.game.state.start('Game',true,false,12);
+        starCuts.game.state.start('Game',true,false,1);
     },
 
     startLevelSelect: function(){

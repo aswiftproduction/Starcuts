@@ -11,11 +11,15 @@ starCuts.Boot.prototype = {
   create: function() {
     
     //loading screen will have a white background
-    this.game.stage.backgroundColor = '#fff';
+    this.game.stage.backgroundColor = '#604c4c';
     
     //physics system
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
-    
+	this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+    //have the game centered horizontally
+	this.scale.pageAlignHorizontally = true;
+	this.scale.pageAlignVertically = true;
+
     this.state.start('Preload');
     
   }
