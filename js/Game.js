@@ -126,18 +126,18 @@ starCuts.Game.prototype = {
 		
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
-<<<<<<< HEAD
+
 		this.bgMusic=this.game.add.audio('bgmusic');
 		this.loseSound=this.game.add.audio('oww');
 
 		this.bgMusic.play();
-=======
+
 		
 		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
 		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
 		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
 		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
->>>>>>> c39f4074a0e6df51683e02c86163f716cb415fb8
+
     },
     update: function () {
 
