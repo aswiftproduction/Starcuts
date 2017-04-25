@@ -10,7 +10,7 @@ var startWinX=1000;
 var endWinX = 1113;
 var lineDrawer;
 
-var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
+var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'phoneguy'];
 
 starCuts.Game.prototype = {
 
@@ -31,7 +31,11 @@ starCuts.Game.prototype = {
         this.lineGroup = this.game.add.group();
 		this.lineGroup.enableBody = true;
 
+
+		//renders sprites in the lineGroup
         this.generateLevelArray(sampleArray, 400, 125);
+
+        this.generateLineObjectAnimation(this.lineGroup);
 		
 		
         //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -173,6 +177,35 @@ starCuts.Game.prototype = {
 
 
     },
+
+
+    phoneGuyAnimationController: function(phoneGuy,delay) {
+
+        phoneGuy.animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
+        phoneGuy.animations.add('lookAhead',[7,8,9,10,11],9,false);
+        phoneGuyTimer = this.game.time.create(false);
+        phoneGuy.play('lookAhead',false);
+        var lookingAhead = true;
+        var animationToPlay = ((lookingAhead === true) ? 'lookAtPhone' : 'lookAhead');
+
+
+    },
+
+
+    generateLineObjectAnimation: function (lineGroup) {
+
+        for ( var i = 0; i < lineGroup.length; i++) {
+
+            if(lineGroup.children[i].key === 'phoneguy') {
+
+                this.phoneGuyAnimationController(lineGroup.children[i],5);
+            }
+        }
+    },
+
+
+
+
     getLineElmtX: function(LineGroup, index) { // Currently returns the x coord at which the sprite begins
         //TODO add the pixel width of the sprite to get the x coord at which the sprite ends
         var lineElement = LineGroup.children[index];
@@ -191,7 +224,7 @@ starCuts.Game.prototype = {
 		gameOver=true;
 	},
 	restart: function(won){
-		goToLevel=gameWon?this.currentLevel+1:this.currentLevel
+		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
 		gameOver=false;
 		gameWon=false;
 		hasJumped=false;
@@ -200,7 +233,7 @@ starCuts.Game.prototype = {
 	hasWon: function(){
 		console.log("you win");
 		this.gameWonText = this.game.add.text(this.game.world.centerX, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
-		this.gameWonText.anchor.setTo(0.5,0.5)
+		this.gameWonText.anchor.setTo(0.5,0.5);
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
@@ -212,6 +245,9 @@ starCuts.Game.prototype = {
 	onDragStart:function(sprite,pointer){
 		this.player.animations.play('crouch');
 	}
+
+
+
 
 
 };

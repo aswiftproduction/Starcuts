@@ -25,6 +25,7 @@ starCuts.Preload.prototype = {
     this.game.load.image('borednpc', 'assets/npc_bored.png');
     this.game.load.image('talking_l', 'assets/npc_talking_l.png');
     this.game.load.image('talking_r', 'assets/npc_talking_r.png');
+    this.game.load.spritesheet('phoneguy', 'assets/phone_guy_sprite.png',61,112);
   },
   create: function() {
     this.state.start('MainMenu');
