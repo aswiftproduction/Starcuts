@@ -113,6 +113,10 @@ starCuts.Game.prototype = {
 		
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
+		this.bgMusic=this.game.add.audio('bgmusic');
+		this.loseSound=this.game.add.audio('oww');
+
+		this.bgMusic.play();
     },
     update: function () {
 
@@ -248,10 +252,13 @@ starCuts.Game.prototype = {
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
 		this.player.body.gravity.y = 0;
+		this.loseSound.play();
+
 		gameOver=true;
 	},
 	restart: function(self){
 		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
+		this.bgMusic.stop();
 		gameOver=false;
 		gameWon=false;
 		hasJumped=false;

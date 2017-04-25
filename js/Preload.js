@@ -30,6 +30,8 @@ starCuts.Preload.prototype = {
 	this.game.load.image('cashier', 'assets/Cashier_Desk.png');
 	this.game.load.audio('jump','assets/jump.wav');
 	this.game.load.audio('win','assets/win.wav');
+	this.game.load.audio('bgmusic', 'assets/background_music.mp3');
+	this.game.load.audio('oww','assets/oww.wav');
   },
   create: function() {
     this.state.start('MainMenu');
