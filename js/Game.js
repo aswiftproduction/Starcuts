@@ -14,11 +14,12 @@ var worldBound=1280;
 var currentLevel;
 var enemyLeftOffset=400;
 var enemySpacing=125;
+var lossPositions = [];
+var isChecking = false;
 
-var sampleArray = ['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc', ];
 var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
-				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
+				['phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
 
 starCuts.Game.prototype = {
 
@@ -28,7 +29,6 @@ starCuts.Game.prototype = {
 		console.log("current level: "+this.currentLevel);
 		if(this.currentLevel>levelsArray.length || this.currentLevel<1)
 			this.state.start('MainMenu');
-		//sampleArray=levelsArray[this.currentLevel-1];
 		this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
 		this.levelText.fixedToCamera = true;
     },
@@ -49,8 +49,24 @@ starCuts.Game.prototype = {
 		this.lineGroup.enableBody = true;
 
 
+
+
+
+
 		//renders sprites in the lineGroup
         this.generateLevelArray(levelsArray[this.currentLevel-1], enemyLeftOffset,enemySpacing);
+
+        for(var i = 0; i < this.lineGroup.length; i++) {
+
+
+            if (this.lineGroup.children[i].key === 'phoneguy') {
+
+                lossPositions.push([0,0]);
+                console.log(lossPositions);
+            }
+
+        }
+
 
         this.generateLineObjectAnimation(this.lineGroup);
         //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -129,41 +145,81 @@ starCuts.Game.prototype = {
         //
 
 
-		if(gameOver){
-			this.game.input.onDown.add(this.restart,this);
-			return;
-		}
+        if (gameOver) {
+            this.game.input.onDown.add(this.restart, this);
+            return;
+        }
         //  Collide the player with the platforms
-		//this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
+        //this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
         this.hitPlatform = this.game.physics.arcade.collide(this.player, this.ground);
-		//	Collide player with people in line
-		this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
+        //	Collide player with people in line
+        this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 
         //Animation controls for player
         if (/*this.player.body.touching.down && */this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
             //this.player.animations.stop();
-			if(hasJumped && !this.game.input.mousePointer.isDown){
-				this.player.animations.stop();
-				this.player.frame = 0;
-			}else if(!this.game.input.mousePointer.isDown){
-				this.player.animations.stop();
-				this.player.frame = 1;
-			}else if(this.game.input.mousePointer.isDown){
-				//this.player.animations.play('crouch');
-			}
+            if (hasJumped && !this.game.input.mousePointer.isDown) {
+                this.player.animations.stop();
+                this.player.frame = 0;
+            } else if (!this.game.input.mousePointer.isDown) {
+                this.player.animations.stop();
+                this.player.frame = 1;
+            } else if (this.game.input.mousePointer.isDown) {
+                //this.player.animations.play('crouch');
+            }
         }
-		
-		if(/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x-this.game.camera.x>=startWinX && this.player.x-this.game.camera.x<=endWinX){
-			this.hasWon();
-		}
-        if(/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x-this.game.camera.x>endWinX) {
-		    this.hitPatron(this.player,null);
+
+        if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x >= startWinX && this.player.x - this.game.camera.x <= endWinX) {
+            this.hasWon();
+        }
+        if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
+            this.hitPatron(this.player, null);
+        }
+
+
+        if (this.hitPlatform) {
+            var hasLost = false;
+            hasLanded = true;
+            this.checkLand();
+            for (var i = 0; i < lossPositions.length; i++) {
+
+                if (this.player.x > lossPositions[i][0] && this.player.x < lossPositions[i][1]) {
+                    hasLost = true;
+                    console.log("You have lost");
+                }
+
+            }
+
+            if (hasLost) {
+                this.hitPatron(this.player, null);
+            }
+
+        }
+
+
+
+    },
+
+
+    checkLand: function() {
+
+        if(!isChecking) {
+           var xValue = this.player.x;
+           var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
+            console.log(xValue);
+            console.log(isLooking);
+            isChecking = true;
+
+            if(isLooking && (xValue >= lossPositions[0][0] && xValue < lossPositions[0][1])) {
+                this.hitPatron(this.player,null);
+            }
         }
 
     },
-    onDragStop: function (sprite, pointer) {
+
+    onDragStop: function(sprite, pointer) {
         lineDrawer.clear();
         var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
         var ydiff = sprite.position.y - pointer.y;
@@ -173,6 +229,7 @@ starCuts.Game.prototype = {
         hasJumped = true;
 		this.player.animations.play('fly');
 		this.jumpSound.play();
+		isChecking = false;
     },
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
@@ -206,26 +263,70 @@ starCuts.Game.prototype = {
     },
 
 
-    phoneGuyAnimationController: function(phoneGuy,delay) {
+    phoneGuyAnimationController: function(phoneGuy,delay,lineNumber) {
+        timer = this.game.time.create();
+        timer.loop(delay * 1000,this.phoneGuyTimerFunction,this,phoneGuy,phoneGuy.x,lineNumber);
+        timer.start();
+    },
 
-        phoneGuy.animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
-        phoneGuy.animations.add('lookAhead',[7,8,9,10,11],9,false);
-        phoneGuyTimer = this.game.time.create(false);
-        phoneGuy.play('lookAhead',false);
-        var lookingAhead = true;
-        var animationToPlay = ((lookingAhead === true) ? 'lookAtPhone' : 'lookAhead');
+
+    phoneGuyTimerFunction: function (phoneGuy,xPosition,lineNumber) {
+        if(phoneGuy.lookUp) {
+            phoneGuy.animations.play('lookAtPhone',false);
+            lossPositions[lineNumber] = [xPosition, xPosition + 150];
+        }
+
+        else {
+            phoneGuy.animations.play('lookAhead',false);
+            lossPositions[lineNumber] = [0,0];
+        }
+        phoneGuy.lookUp = !phoneGuy.lookUp;
+
+    },
+
+    pacingGuyAnimationController: function(pacingGuy) {
 
 
     },
 
 
-    generateLineObjectAnimation: function (lineGroup) {
+    tossingGuyAnimationController: function(tossingGuy) {
 
+
+
+    },
+
+
+
+
+    generateLineObjectAnimation: function (lineGroup) {
+        var numPhoneGuys = 0;
         for ( var i = 0; i < lineGroup.length; i++) {
 
             if(lineGroup.children[i].key === 'phoneguy') {
 
-                this.phoneGuyAnimationController(lineGroup.children[i],5);
+                lineGroup.children[i].animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
+                lineGroup.children[i].animations.add('lookAhead',[7,8,9,10,11],9,false);
+                lineGroup.children[i].lookUp = true;
+                this.phoneGuyAnimationController(lineGroup.children[i],1,numPhoneGuys);
+                numPhoneGuys += 1;
+            }
+
+            else if(lineGroup.children[i].key === 'pacingguy') {
+
+                lineGroup.children[i].animations.add('walkLeft', [6,7,8,9,10,11]);
+                lineGroup.children[i].animations.add('walkRight', [0,1,2,3,4,5]);
+
+            }
+
+            else if(lineGroup.children[i].key === 'tossingguy') {
+
+                lineGroup.children[i].animations.add('tossup', [0,1,2,3,4,5,6]);
+                lineGroup.children[i].animations.add('catch' [6,7,8,9,10,11]);
+            }
+
+            else {
+
             }
         }
     },
