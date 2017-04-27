@@ -222,18 +222,7 @@ starCuts.Game.prototype = {
             hasLanded = true;
             if (this.currentLevel == 3) {
                 this.checkLand();
-                for (var i = 0; i < lossPositions.length; i++) {
 
-                    if (this.player.x > lossPositions[i][0] && this.player.x < lossPositions[i][1]) {
-                        hasLost = true;
-                        console.log("You have lost");
-                    }
-
-                }
-
-                if (hasLost) {
-                    this.hitPatron(this.player, null);
-                }
 
             }
 
@@ -247,11 +236,15 @@ starCuts.Game.prototype = {
         if(!isChecking) {
            var xValue = this.player.x;
            var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
-            console.log(xValue);
-            console.log(isLooking);
+
             isChecking = true;
 
-            if(isLooking && (xValue >= lossPositions[0][0] && xValue < lossPositions[0][1])) {
+            //console.log(isLooking.toString());
+            console.log("Look:" + isLooking.toString() + " x:" + xValue);
+            console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1])
+            if((isLooking.valueOf() == true) && (lossPositions[0][0] <= xValue && xValue < lossPositions[0][1])) {
+                console.log("Look:" + isLooking.toString() + " x:" + xValue);
+                console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1])
                 this.hitPatron(this.player,null);
             }
         }
@@ -317,7 +310,7 @@ starCuts.Game.prototype = {
 
         else {
             phoneGuy.animations.play('lookAhead',false);
-            lossPositions[lineNumber] = [0,0];
+            //lossPositions[lineNumber] = [0,0];
         }
         phoneGuy.lookUp = !phoneGuy.lookUp;
 
@@ -347,7 +340,7 @@ starCuts.Game.prototype = {
                 lineGroup.children[i].animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
                 lineGroup.children[i].animations.add('lookAhead',[7,8,9,10,11],9,false);
                 lineGroup.children[i].lookUp = true;
-                this.phoneGuyAnimationController(lineGroup.children[i],3,numPhoneGuys);
+                this.phoneGuyAnimationController(lineGroup.children[i],5,numPhoneGuys);
                 numPhoneGuys += 1;
             }
 
