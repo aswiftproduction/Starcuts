@@ -14,8 +14,6 @@ starCuts.Preload.prototype = {
     this.game.load.image('background', 'assets/background.png');
     this.game.load.image('floor', 'assets/floor.png');
     this.game.load.spritesheet('player', 'assets/player_sprite.png', 80, 112);
-    this.game.load.spritesheet('baddie', 'assets/baddie.png', 32,32);
-    this.game.load.image('star', 'assets/star.png');
     this.game.load.image('main menu', 'assets/main menu.png');
     this.game.load.image('play game', 'assets/play game.png');
     this.game.load.image('level select', 'assets/level select.png');
@@ -32,6 +30,8 @@ starCuts.Preload.prototype = {
 	this.game.load.image('cashier', 'assets/Cashier_Desk.png');
 	this.game.load.audio('jump','assets/jump.wav');
 	this.game.load.audio('win','assets/win.wav');
+	this.game.load.audio('bgmusic', 'assets/background_music.mp3');
+	this.game.load.audio('oww','assets/oww.wav');
   },
   create: function() {
     this.state.start('MainMenu');

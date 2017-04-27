@@ -16,10 +16,23 @@ var enemyLeftOffset=400;
 var enemySpacing=125;
 var lossPositions = [];
 var isChecking = false;
+var isInvincible=false;
+var invincibleTimer=-1;
 
 var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
-				['phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
+				['phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
+				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
+var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
+	"You don't have time to wait in line.\nJump over the patient patrons",
+	"Cut the guy when he isn't looking at his phone"];
+var levelJson=[{enemies:['blank'],
+                text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)"},
+               {enemies:['blank', 'blank', 'pinknpc', 'blank'],
+                text:"You don't have time to wait in line.\nJump over the patient patrons"},
+               {enemies:['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+                text:"Cut the guy when he isn't looking at his phone."},
+];
 
 starCuts.Game.prototype = {
 
@@ -31,6 +44,7 @@ starCuts.Game.prototype = {
 			this.state.start('MainMenu');
 		this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
 		this.levelText.fixedToCamera = true;
+		this.tutorialText=this.game.add.text(16, 200, tutorialTextArray[currentLevel-1], { fontSize: '16px', fill: '#000' });
     },
 
 
@@ -129,31 +143,55 @@ starCuts.Game.prototype = {
 		
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
+
+		this.bgMusic=this.game.add.audio('bgmusic');
+		this.loseSound=this.game.add.audio('oww');
+
+		this.bgMusic.play();
+
+		
+		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
+		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
+		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
+		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+
     },
     update: function () {
 
-        //===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
-        // this.game.debug.bodyInfo(this.player,80,112);
-        // this.game.debug.body(this.player);
-        //
-        // for (var i = 0; i < this.lineGroup.length; i++) {
-        //
-        //     this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
-        //     this.game.debug.body(this.lineGroup.children[i]);
-        // }
-        //
-        //
+     //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
+        this.game.debug.bodyInfo(this.player,80,112);
+        this.game.debug.body(this.player);
 
+        for (var i = 0; i < this.lineGroup.length; i++) {
 
-        if (gameOver) {
-            this.game.input.onDown.add(this.restart, this);
-            return;
+            this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
+            this.game.debug.body(this.lineGroup.children[i]);
         }
+
+
+		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);},this);
+		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);},this);
+		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);},this);
+		
+		invincibleTimer=(invincibleTimer>0)?invincibleTimer-1:-1;
+		if(invincibleTimer<=0)
+			spacebar.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
+		if(isInvincible)
+			this.lineGroup.alpha=0.5;
+		else
+			this.lineGroup.alpha=1;
+		
+		
+		if(gameOver){
+			this.game.input.onDown.add(this.restart,this);
+			return;
+		}
         //  Collide the player with the platforms
         //this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
         this.hitPlatform = this.game.physics.arcade.collide(this.player, this.ground);
-        //	Collide player with people in line
-        this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
+		//	Collide player with people in line
+		if(!isInvincible)
+			this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 
         //Animation controls for player
         if (/*this.player.body.touching.down && */this.hitPlatform) {
@@ -182,23 +220,24 @@ starCuts.Game.prototype = {
         if (this.hitPlatform) {
             var hasLost = false;
             hasLanded = true;
-            this.checkLand();
-            for (var i = 0; i < lossPositions.length; i++) {
+            if (this.currentLevel == 3) {
+                this.checkLand();
+                for (var i = 0; i < lossPositions.length; i++) {
 
-                if (this.player.x > lossPositions[i][0] && this.player.x < lossPositions[i][1]) {
-                    hasLost = true;
-                    console.log("You have lost");
+                    if (this.player.x > lossPositions[i][0] && this.player.x < lossPositions[i][1]) {
+                        hasLost = true;
+                        console.log("You have lost");
+                    }
+
+                }
+
+                if (hasLost) {
+                    this.hitPatron(this.player, null);
                 }
 
             }
 
-            if (hasLost) {
-                this.hitPatron(this.player, null);
-            }
-
         }
-
-
 
     },
 
@@ -273,7 +312,7 @@ starCuts.Game.prototype = {
     phoneGuyTimerFunction: function (phoneGuy,xPosition,lineNumber) {
         if(phoneGuy.lookUp) {
             phoneGuy.animations.play('lookAtPhone',false);
-            lossPositions[lineNumber] = [xPosition, xPosition + 150];
+            lossPositions[lineNumber] = [xPosition, xPosition + 300];
         }
 
         else {
@@ -308,7 +347,7 @@ starCuts.Game.prototype = {
                 lineGroup.children[i].animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
                 lineGroup.children[i].animations.add('lookAhead',[7,8,9,10,11],9,false);
                 lineGroup.children[i].lookUp = true;
-                this.phoneGuyAnimationController(lineGroup.children[i],1,numPhoneGuys);
+                this.phoneGuyAnimationController(lineGroup.children[i],3,numPhoneGuys);
                 numPhoneGuys += 1;
             }
 
@@ -349,10 +388,13 @@ starCuts.Game.prototype = {
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
 		this.player.body.gravity.y = 0;
+		this.loseSound.play();
+
 		gameOver=true;
 	},
 	restart: function(self){
 		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
+		this.bgMusic.stop();
 		gameOver=false;
 		gameWon=false;
 		hasJumped=false;
@@ -361,7 +403,7 @@ starCuts.Game.prototype = {
 	hasWon: function(){
 		console.log("you win");
 		this.gameWonText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
-		this.gameWonText.anchor.setTo(0.5,0.5)
+		this.gameWonText.anchor.setTo(0.5,0.5);
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
