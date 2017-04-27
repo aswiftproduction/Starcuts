@@ -157,17 +157,17 @@ starCuts.Game.prototype = {
 
     },
     update: function () {
-
-     //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
-        this.game.debug.bodyInfo(this.player,80,112);
-        this.game.debug.body(this.player);
-
-        for (var i = 0; i < this.lineGroup.length; i++) {
-
-            this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
-            this.game.debug.body(this.lineGroup.children[i]);
-        }
-
+     //
+     // //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
+     //    this.game.debug.bodyInfo(this.player,80,112);
+     //    this.game.debug.body(this.player);
+     //
+     //    for (var i = 0; i < this.lineGroup.length; i++) {
+     //
+     //        this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
+     //        this.game.debug.body(this.lineGroup.children[i]);
+     //    }
+     //
 
 		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);},this);
 		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);},this);
@@ -228,6 +228,8 @@ starCuts.Game.prototype = {
 
         }
 
+        this.pacingGuyMove(this.lineGroup.children[0]);
+
     },
 
 
@@ -238,10 +240,6 @@ starCuts.Game.prototype = {
            var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
 
             isChecking = true;
-
-            //console.log(isLooking.toString());
-            console.log("Look:" + isLooking.toString() + " x:" + xValue);
-            console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1])
             if((isLooking.valueOf() == true) && (lossPositions[0][0] <= xValue && xValue < lossPositions[0][1])) {
                 console.log("Look:" + isLooking.toString() + " x:" + xValue);
                 console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1])
@@ -285,8 +283,10 @@ starCuts.Game.prototype = {
             if(!(array[i] === "blank")) {
                 var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
                 LineObject.body.setSize(45,90,18,10);
+
             }
             else {
+
                 continue;
             }
         }
@@ -316,11 +316,36 @@ starCuts.Game.prototype = {
 
     },
 
-    pacingGuyAnimationController: function(pacingGuy) {
+    pacingGuyAnimationController: function(pacingGuy,speed,endX) {
 
+        pacingGuy.startX = pacingGuy.x;
+        pacingGuy.endX = endX;
+        pacingGuy.speed = speed;
+        pacingGuy.body.velocity.x = 100;
 
     },
 
+
+    pacingGuyMove: function(pacingGuy) {
+
+
+
+      if ( (pacingGuy.x < pacingGuy.startX) || (pacingGuy.x > pacingGuy.endX)) {
+
+          pacingGuy.body.velocity.x *= -1;
+
+          pacingGuy.body.x = pacingGuy.body.x + pacingGuy.body.velocity.x * .04;
+      }
+
+      if (pacingGuy.body.velocity.x > 0) {
+          pacingGuy.animations.play("walkRight");
+      }
+      if  (pacingGuy.body.velocity.x < 0) {
+          pacingGuy.animations.play("walkLeft");
+      }
+
+
+    },
 
     tossingGuyAnimationController: function(tossingGuy) {
 
@@ -346,8 +371,9 @@ starCuts.Game.prototype = {
 
             else if(lineGroup.children[i].key === 'pacingguy') {
 
-                lineGroup.children[i].animations.add('walkLeft', [6,7,8,9,10,11]);
-                lineGroup.children[i].animations.add('walkRight', [0,1,2,3,4,5]);
+                lineGroup.children[i].animations.add('walkLeft', [6,7,8,9,10,11],12,true);
+                lineGroup.children[i].animations.add('walkRight', [0,1,2,3,4,5],12,true);
+                this.pacingGuyAnimationController(lineGroup.children[i],10,lineGroup.children[i+1].x); // Pacing guy cannot be last guy
 
             }
 
@@ -417,9 +443,6 @@ starCuts.Game.prototype = {
 				this.game.add.sprite(leftOffset+(i*distToNext), -40, 'topLamp');
 		}
 	}
-
-
-
 
 
 };
