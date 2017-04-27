@@ -19,7 +19,7 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+var levelsArray=[['pacingguy', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
 				['phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
 				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
@@ -228,7 +228,7 @@ starCuts.Game.prototype = {
 
         }
 
-        this.pacingGuyMove(this.lineGroup.children[0]);
+        this.lineGroup.children[0].ai();
 
     },
 
@@ -326,26 +326,6 @@ starCuts.Game.prototype = {
     },
 
 
-    pacingGuyMove: function(pacingGuy) {
-
-
-
-      if ( (pacingGuy.x < pacingGuy.startX) || (pacingGuy.x > pacingGuy.endX)) {
-
-          pacingGuy.body.velocity.x *= -1;
-
-          pacingGuy.body.x = pacingGuy.body.x + pacingGuy.body.velocity.x * .04;
-      }
-
-      if (pacingGuy.body.velocity.x > 0) {
-          pacingGuy.animations.play("walkRight");
-      }
-      if  (pacingGuy.body.velocity.x < 0) {
-          pacingGuy.animations.play("walkLeft");
-      }
-
-
-    },
 
     tossingGuyAnimationController: function(tossingGuy) {
 
@@ -371,9 +351,25 @@ starCuts.Game.prototype = {
 
             else if(lineGroup.children[i].key === 'pacingguy') {
 
+
                 lineGroup.children[i].animations.add('walkLeft', [6,7,8,9,10,11],12,true);
                 lineGroup.children[i].animations.add('walkRight', [0,1,2,3,4,5],12,true);
                 this.pacingGuyAnimationController(lineGroup.children[i],10,lineGroup.children[i+1].x); // Pacing guy cannot be last guy
+				console.log(lineGroup.children[i]);
+				lineGroup.children[i].ai = function(){
+
+					if ( (this.x < this.startX) || (this.x > this.endX)) {
+						this.body.velocity.x *= -1;
+						this.body.x = this.body.x + this.body.velocity.x * .04;
+					}
+
+					if (this.body.velocity.x > 0) {
+						this.animations.play("walkRight");
+					}
+					if  (this.body.velocity.x < 0) {
+						this.animations.play("walkLeft");
+					}
+				}
 
             }
 
