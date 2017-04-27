@@ -19,10 +19,10 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['pacingguy', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+var levelsArray=[['pinknpc','pacingguy', 'blank', 'pinknpc', 'blank', 'pinknpc'],
 				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
-				['phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
-				['pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc']];
+				['phoneguy', 'blank', 'borednpc','pacingguy', 'blank', 'blank', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
+				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','pinknpc', 'borednpc']];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he isn't looking at his phone"];
@@ -220,15 +220,18 @@ starCuts.Game.prototype = {
         if (this.hitPlatform) {
             var hasLost = false;
             hasLanded = true;
-            if (this.currentLevel == 3) {
-                this.checkLand();
-
-
-            }
+			this.checkLand();
 
         }
 
-        this.lineGroup.children[0].ai();
+
+        for (var x = 0; x < this.lineGroup.length; x++){
+
+        	//Pacing guy
+			if (this.lineGroup.children[x].key === "pacingguy")
+        	this.lineGroup.children[x].ai();
+		}
+
 
     },
 
@@ -242,7 +245,7 @@ starCuts.Game.prototype = {
             isChecking = true;
             if((isLooking.valueOf() == true) && (lossPositions[0][0] <= xValue && xValue < lossPositions[0][1])) {
                 console.log("Look:" + isLooking.toString() + " x:" + xValue);
-                console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1])
+                console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
                 this.hitPatron(this.player,null);
             }
         }
