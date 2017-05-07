@@ -19,8 +19,8 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['pinknpc','pacingguy', 'blank', 'pinknpc', 'blank', 'pinknpc'],
-				['pinknpc', 'blank', 'pinknpc', 'pinknpc', 'borednpc'],
+var levelsArray=[['borednpc','talking_r','talking_l', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+				['phoneguy', 'blank', 'borednpc', 'pinknpc', 'blank','borednpc','borednpc','talking_l'],
 				['phoneguy', 'blank', 'borednpc','pacingguy', 'blank', 'blank', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
 				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','pinknpc', 'borednpc']];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
@@ -284,8 +284,17 @@ starCuts.Game.prototype = {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
         for (var i = 0; i < array.length; i++) {
             if(!(array[i] === "blank")) {
-                var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
-                LineObject.body.setSize(45,90,18,10);
+                if (array[i] === "pacingguy") {
+
+                    var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 170, array[i]);
+                    LineObject.body.setSize(45,90,18,10);
+
+                }
+                else {
+                    var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
+                    LineObject.body.setSize(45,90,18,10);
+
+                }
 
             }
             else {
