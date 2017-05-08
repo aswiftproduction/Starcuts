@@ -346,7 +346,7 @@ starCuts.Game.prototype = {
 
         else {
             phoneGuy.animations.play('lookAhead',false);
-            //lossPositions[lineNumber] = [0,0];
+            lossPositions[lineNumber] = [0,0];
         }
         phoneGuy.lookUp = !phoneGuy.lookUp;
 
