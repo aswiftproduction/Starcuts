@@ -15,6 +15,11 @@ starCuts.Preload.prototype = {
     this.game.load.image('floor', 'assets/floor.png');
     this.game.load.spritesheet('player', 'assets/player_sprite.png', 80, 112);
     this.game.load.image('main menu', 'assets/main menu.png');
+    this.game.load.image('back', 'assets/back.png');
+    this.game.load.image('level select b', 'assets/level select b.png');
+    this.game.load.image('menu', 'assets/menu.png');
+    this.game.load.image('pause menu', 'assets/pause menu.png');
+    this.game.load.image('exit', 'assets/exit.png');
     this.game.load.image('play game', 'assets/play game.png');
     this.game.load.image('level select', 'assets/level select.png');
     this.game.load.image('level select menu', 'assets/level select menu.png');

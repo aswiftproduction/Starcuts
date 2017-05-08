@@ -21,6 +21,17 @@ starCuts.LevelSelect.prototype =
         //Create array of cups
         this.createLevelsGUI(3,4, 190, 185);
 
+        //Create back button
+        this.back = this.game.add.sprite(30,15,'back');
+        this.back.alpha = 0.5;
+        this.back.inputEnabled = true;
+        this.back.events.onInputOver.add(function () {
+            this.alpha = 1;
+        }, this.back);
+        this.back.events.onInputOut.add(function () {
+            this.alpha = 0.5;
+        }, this.back);
+        this.back.events.onInputDown.add(this.mainMenu);
     },
 
     createLevelsGUI: function (numRows, numCols, xMargin, yMargin)
@@ -64,7 +75,14 @@ starCuts.LevelSelect.prototype =
     startLevel: function()
     {
         starCuts.game.state.start('Game',true,false, this.level);
+    },
+
+    mainMenu: function()
+    {
+        starCuts.game.state.start('MainMenu');
     }
+
+
 
 
 };
