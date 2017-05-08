@@ -235,9 +235,9 @@ starCuts.Game.prototype = {
 			//Tossing guy
 			if(this.lineGroup.children[x].key === "tossingguy"){
 				var tmpTossingGuy=this.lineGroup.children[x];
-				if(tmpTossingGuy.isThrowing && tmpTossingGuy.phone.body.y>(this.game.height - 105)){
+				if(tmpTossingGuy.isThrowing && tmpTossingGuy.phone.body.y>(this.game.height - 110)){
 					tmpTossingGuy.isThrowing=false;
-					//tmpTossingGuy.phone.body.y=this.game.height - 105;
+					tmpTossingGuy.phone.body.y=this.game.height - 105;
 					tmpTossingGuy.phone.body.velocity.x=0;
 					tmpTossingGuy.phone.body.velocity.y=0;
 					tmpTossingGuy.phone.body.gravity.y=0;
@@ -372,6 +372,7 @@ starCuts.Game.prototype = {
     },
 	tossingGuyTimerFunction(tossingGuy){
 		if(!tossingGuy.isThrowing){
+			tossingGuy.animations.play('full');
 			tossingGuy.isThrowing=true;
 			tossingGuy.phone.body.gravity.y = 1300;
 			//tossingGuy.phone.body.collideWorldBounds = true;
@@ -423,7 +424,8 @@ starCuts.Game.prototype = {
             else if(lineGroup.children[i].key === 'tossingguy') {
 
                 lineGroup.children[i].animations.add('tossup', [0,1,2,3,4,5,6]);
-                lineGroup.children[i].animations.add('catch' [6,7,8,9,10,11]);
+                lineGroup.children[i].animations.add('catch', [6,7,8,9,10,11]);
+				lineGroup.children[i].animations.add('full', [0,1,2,3,4,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,7,8,9,10,11],24,false);
 				lineGroup.children[i].isThrowing=false;
 				lineGroup.children[i].phone = this.game.add.sprite(lineGroup.children[i].x+50, this.game.world.height - 105, 'phone');
 				this.game.physics.arcade.enable(lineGroup.children[i].phone);
@@ -432,7 +434,7 @@ starCuts.Game.prototype = {
 				lineGroup.children[i].phone.body.collideWorldBounds = true;
 				lineGroup.children[i].phone.body.velocity.y=0;
 				
-				this.tossingGuyAnimationController(lineGroup.children[i],1);
+				this.tossingGuyAnimationController(lineGroup.children[i],1.5);
 				
             }
 
