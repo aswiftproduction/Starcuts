@@ -19,7 +19,7 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['borednpc','talking_r','talking_l', 'blank', 'pinknpc', 'blank', 'pinknpc'],
+var levelsArray=[['blank', 'blank','tossingguy','blank', 'blank'],
 				['phoneguy', 'blank', 'borednpc', 'pinknpc', 'blank','borednpc','borednpc','talking_l'],
 				['phoneguy', 'blank', 'borednpc','pacingguy', 'blank', 'blank', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
 				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','pinknpc', 'borednpc']];
@@ -154,6 +154,7 @@ starCuts.Game.prototype = {
 		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
 		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
 		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+		//console.log(this.player);
 
     },
     update: function () {
@@ -234,13 +235,15 @@ starCuts.Game.prototype = {
 			//Tossing guy
 			if(this.lineGroup.children[x].key === "tossingguy"){
 				var tmpTossingGuy=this.lineGroup.children[x];
-				//TODO perfect this value
-				if(tmpTossingGuy.isThrowing || tmpTossingGuy.phone.y<=(this.game.height - 180)){
+				if(tmpTossingGuy.isThrowing && tmpTossingGuy.phone.body.y>(this.game.height - 105)){
 					tmpTossingGuy.isThrowing=false;
-					tmpTossingGuy.phone.y=this.game.height - 180
-					tmpTossingGuy.phone.velocity.y=0;
-					tmpTossingGuy.phone.body.gravity=0;
+					//tmpTossingGuy.phone.body.y=this.game.height - 105;
+					tmpTossingGuy.phone.body.velocity.x=0;
+					tmpTossingGuy.phone.body.velocity.y=0;
+					tmpTossingGuy.phone.body.gravity.y=0;
 				}
+				if(!isInvincible)
+					this.game.physics.arcade.overlap(this.player, tmpTossingGuy.phone, this.hitPatron, null, this);
 			}
 		}
 
@@ -251,15 +254,24 @@ starCuts.Game.prototype = {
     checkLand: function() {
 
         if(!isChecking) {
-           var xValue = this.player.x;
-           var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
-
-            isChecking = true;
+			var xValue = this.player.x;
+			isChecking = true;
+			for(var i=0;i<lossPositions.length;i++){
+				x=lossPositions[i];
+				if(x[0]<=xValue && x[1]>xValue){
+					console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
+					this.hitPatron(this.player,null);
+				}
+			}
+			/*
+			//assumed phone guy was always first and assumed there was always one enemy, generalized above
+			//var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
             if((isLooking.valueOf() == true) && (lossPositions[0][0] <= xValue && xValue < lossPositions[0][1])) {
-                console.log("Look:" + isLooking.toString() + " x:" + xValue);
+                //console.log("Look:" + isLooking.toString() + " x:" + xValue);
                 console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
                 this.hitPatron(this.player,null);
             }
+			*/
         }
 
     },
@@ -353,13 +365,17 @@ starCuts.Game.prototype = {
 
     tossingGuyAnimationController: function(tossingGuy,delay) {
 		timer = this.game.time.create();
-        timer.loop(delay * 1000,this.tossingGuyTimerFunction,this,tossingGuy,phone);
+        timer.loop(delay * 1000,this.tossingGuyTimerFunction,this,tossingGuy);
         timer.start();
     },
 	tossingGuyTimerFunction(tossingGuy){
-		tossingGuy.isThrowing=true;
-		tmpTossingGuy.phone.body.gravity=1300;
-		tossingGuy.phone.body.velocity=1200;
+		if(!tossingGuy.isThrowing){
+			tossingGuy.isThrowing=true;
+			tossingGuy.phone.body.gravity.y = 1300;
+			//tossingGuy.phone.body.collideWorldBounds = true;
+			tossingGuy.phone.body.velocity.y=-1200;
+		}
+		
 	},
 
 
@@ -407,7 +423,14 @@ starCuts.Game.prototype = {
                 lineGroup.children[i].animations.add('tossup', [0,1,2,3,4,5,6]);
                 lineGroup.children[i].animations.add('catch' [6,7,8,9,10,11]);
 				lineGroup.children[i].isThrowing=false;
-				this.tossingGuyAnimationController(lineGroup.children[i],5);
+				lineGroup.children[i].phone = this.game.add.sprite(lineGroup.children[i].x+50, this.game.world.height - 105, 'phone');
+				this.game.physics.arcade.enable(lineGroup.children[i].phone);
+				lineGroup.children[i].phone.body.gravity.y = 0;
+				lineGroup.children[i].phone.body.bounce.y = 1.0;
+				lineGroup.children[i].phone.body.collideWorldBounds = true;
+				lineGroup.children[i].phone.body.velocity.y=0;
+				
+				this.tossingGuyAnimationController(lineGroup.children[i],1);
 				
             }
 
