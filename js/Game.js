@@ -50,6 +50,7 @@ starCuts.Game.prototype = {
 
     create: function () {
         //this.background = this.game.add.sprite(0, 0, 'background');
+		lossPositions=[];
 		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset+winsize;
 		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
 		this.game.world.setBounds(0, 0, worldBound, this.game.height);
@@ -74,8 +75,7 @@ starCuts.Game.prototype = {
 
 
             if (this.lineGroup.children[i].key === 'phoneguy') {
-
-                lossPositions.push([0,0]);
+                lossPositions.push([this.lineGroup.children[i].x, this.lineGroup.children[i].x + 300]);
                 console.log(lossPositions);
             }
 
@@ -341,12 +341,14 @@ starCuts.Game.prototype = {
     phoneGuyTimerFunction: function (phoneGuy,xPosition,lineNumber) {
         if(phoneGuy.lookUp) {
             phoneGuy.animations.play('lookAtPhone',false);
-            lossPositions[lineNumber] = [xPosition, xPosition + 300];
+            //lossPositions[lineNumber] = [xPosition, xPosition + 300];
+			lossPositions[lineNumber] = [0,0];
         }
 
         else {
             phoneGuy.animations.play('lookAhead',false);
-            lossPositions[lineNumber] = [0,0];
+            //lossPositions[lineNumber] = [0,0];
+			lossPositions[lineNumber] = [xPosition, xPosition + 300];
         }
         phoneGuy.lookUp = !phoneGuy.lookUp;
 
