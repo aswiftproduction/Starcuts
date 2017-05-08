@@ -230,6 +230,18 @@ starCuts.Game.prototype = {
         	//Pacing guy
 			if (this.lineGroup.children[x].key === "pacingguy")
         	this.lineGroup.children[x].ai();
+		
+			//Tossing guy
+			if(this.lineGroup.children[x].key === "tossingguy"){
+				var tmpTossingGuy=this.lineGroup.children[x];
+				//TODO perfect this value
+				if(tmpTossingGuy.isThrowing || tmpTossingGuy.phone.y<=(this.game.height - 180)){
+					tmpTossingGuy.isThrowing=false;
+					tmpTossingGuy.phone.y=this.game.height - 180
+					tmpTossingGuy.phone.velocity.y=0;
+					tmpTossingGuy.phone.body.gravity=0;
+				}
+			}
 		}
 
 
@@ -256,7 +268,7 @@ starCuts.Game.prototype = {
         lineDrawer.clear();
         var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
         var ydiff = sprite.position.y - pointer.y;
-        //console.log("xdiff: " + xdiff + "\nydiff: " + ydiff);
+        //console.log((ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200));
         sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
         sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
         hasJumped = true;
@@ -339,11 +351,16 @@ starCuts.Game.prototype = {
 
 
 
-    tossingGuyAnimationController: function(tossingGuy) {
-
-
-
+    tossingGuyAnimationController: function(tossingGuy,delay) {
+		timer = this.game.time.create();
+        timer.loop(delay * 1000,this.tossingGuyTimerFunction,this,tossingGuy,phone);
+        timer.start();
     },
+	tossingGuyTimerFunction(tossingGuy){
+		tossingGuy.isThrowing=true;
+		tmpTossingGuy.phone.body.gravity=1300;
+		tossingGuy.phone.body.velocity=1200;
+	},
 
 
 
@@ -389,6 +406,9 @@ starCuts.Game.prototype = {
 
                 lineGroup.children[i].animations.add('tossup', [0,1,2,3,4,5,6]);
                 lineGroup.children[i].animations.add('catch' [6,7,8,9,10,11]);
+				lineGroup.children[i].isThrowing=false;
+				this.tossingGuyAnimationController(lineGroup.children[i],5);
+				
             }
 
             else {
