@@ -40,6 +40,12 @@ starCuts.Preload.prototype = {
 	this.game.load.audio('bgmusic', 'assets/background_music.mp3');
 	this.game.load.audio('oww','assets/oww.wav');
 	this.game.load.image('phone', 'assets/phone.png');
+	this.game.load.image('next','assets/next.png');
+	this.game.load.image('previous','assets/previous.png');
+	this.game.load.image('tut1','assets/tutorial_1.png');
+	this.game.load.image('tut2','assets/tutorial_2.png');
+	this.game.load.image('tut3','assets/tutorial_3.png');
+	this.game.load.image('tutorial','assets/how to play.png');
   },
   create: function() {
     this.state.start('MainMenu');

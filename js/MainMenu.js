@@ -12,17 +12,21 @@ starCuts.MainMenu.prototype = {
         this.menu = this.game.add.sprite(0,0,'main menu');
 
         //create play game button and set events
-        this.playGame = this.game.add.sprite(171,262,'play game');
-        this.playGame.inputEnabled = true
+        this.playGame = this.game.add.sprite(171,243,'play game');
+        this.playGame.inputEnabled = true;
         this.playGame.anchor.setTo(0.5,0.5);
         this.playGame.events.onInputDown.add(this.startGame);
 
         //Create level select button and set events
-        this.levelSelect = this.game.add.sprite(205,363,'level select');
+        this.levelSelect = this.game.add.sprite(205,323,'level select');
         this.levelSelect.inputEnabled = true;
         this.levelSelect.anchor.setTo(0.5,0.5);
         this.levelSelect.events.onInputDown.add(this.startLevelSelect);
 
+        this.howtoplay = this.game.add.sprite(205,403,'tutorial');
+        this.howtoplay.inputEnabled = true;
+        this.howtoplay.anchor.setTo(0.5,0.5);
+        this.howtoplay.events.onInputDown.add(this.startTutorial);
     },
 
     update: function () {
@@ -40,6 +44,12 @@ starCuts.MainMenu.prototype = {
             this.levelSelect.scale.setTo(0.9,0.9);
         }
 
+        if (this.howtoplay.input.pointerOver()){
+            this.howtoplay.scale.setTo(1,1);
+        }else{
+            this.howtoplay.scale.setTo(0.9,0.9);
+        }
+
 
     },
 
@@ -49,6 +59,10 @@ starCuts.MainMenu.prototype = {
 
     startLevelSelect: function(){
         starCuts.game.state.start('LevelSelect');
+    },
+
+    startTutorial: function(){
+        starCuts.game.state.start('Tutorial');
     }
 
 };

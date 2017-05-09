@@ -6,6 +6,7 @@ starCuts.game.state.add('Boot', starCuts.Boot);
 starCuts.game.state.add('Preload', starCuts.Preload);
 starCuts.game.state.add('MainMenu', starCuts.MainMenu);
 starCuts.game.state.add('LevelSelect', starCuts.LevelSelect);
+starCuts.game.state.add('Tutorial', starCuts.Tutorial);
 starCuts.game.state.add('Game', starCuts.Game);
 
  
