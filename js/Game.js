@@ -20,18 +20,18 @@ var isInvincible=false;
 var invincibleTimer=-1;
 
 var levelsArray=[['pinknpc', 'blank','blank','borednpc', 'blank'],
-				['phoneguy', 'blank', 'borednpc', 'pinknpc', 'blank','borednpc','borednpc','talking_l'],
-				['phoneguy', 'blank', 'borednpc','pacingguy', 'blank', 'phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
-				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','pinknpc', 'borednpc']];
+				['phoneguy', 'blank', 'blank', 'pinknpc', 'blank','borednpc','blank'],
+				['phoneguy', 'blank', 'borednpc','blank', 'blank', 'phoneguy', 'blank','pinknpc', 'blank','pacingguy', 'blank','borednpc'],
+				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','blank', 'borednpc']];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he isn't looking at his phone"];
 var levelJson=[{enemies:['blank'],
                 text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)"},
                {enemies:['blank', 'blank', 'pinknpc', 'blank'],
-                text:"You don't have time to wait in line.\nJump over the patient patrons"},
+                text:"Cut the guy when he is looking at his phone."},
                {enemies:['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
-                text:"Cut the guy when he isn't looking at his phone."},
+                text:""},
 ];
 
 var loseTextArray=[];
@@ -476,14 +476,16 @@ starCuts.Game.prototype = {
         }
 		this.gameOverText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'Game Over\n' + text + '\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameOverText.anchor.setTo(0.5,0.5);
-		this.player.body.velocity.x = 0;
+
+
+        this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
 		this.player.body.gravity.y = 0;
 		this.loseSound.play();
 
 		gameOver=true;
-        this.game.physics.arcade.isPaused=true;
+
 	},
 	restart: function(self){
         this.game.physics.arcade.isPaused=false;
@@ -498,6 +500,7 @@ starCuts.Game.prototype = {
 		console.log("you win");
 		this.gameWonText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameWonText.anchor.setTo(0.5,0.5);
+        this.game.physics.arcade.isPaused=true;
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
 		this.player.inputEnabled = false;
