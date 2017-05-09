@@ -56,7 +56,7 @@ starCuts.LevelSelect.prototype =
                 this.cup.alpha = 0.15;
 
                 //Hightlight on mouseover
-                if ((level>0&& level<=4) || level == 12) {
+
                     this.cup.alpha = 0.5;
                     this.cup.inputEnabled = true;
                     this.cup.events.onInputOver.add(function () {
@@ -68,7 +68,7 @@ starCuts.LevelSelect.prototype =
 
                     //Level selection
                     this.cup.events.onInputDown.add(this.startLevel, {level: level});
-                }
+
 
             }
         }
