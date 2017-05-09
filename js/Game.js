@@ -34,7 +34,7 @@ var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
                 []];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
-	"Cut the guy when he isn't looking at his phone"];
+	"Cut the guy when he is looking at his phone"];
 var levelJson=[{enemies:['blank'],
                 text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)"},
                {enemies:['blank', 'blank', 'pinknpc', 'blank'],
