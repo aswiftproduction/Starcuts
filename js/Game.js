@@ -462,7 +462,7 @@ starCuts.Game.prototype = {
 				lineGroup.children[i].phone.body.collideWorldBounds = true;
 				lineGroup.children[i].phone.body.velocity.y=0;
 				
-				this.tossingGuyAnimationController(lineGroup.children[i],1.5);
+				this.tossingGuyAnimationController(lineGroup.children[i],1.5+2*Math.random());
 				
             }
 
