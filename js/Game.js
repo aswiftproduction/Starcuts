@@ -165,6 +165,8 @@ starCuts.Game.prototype = {
 		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
 		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
 		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+		mKey=this.game.input.keyboard.addKey(Phaser.KeyCode.M);
+		nKey=this.game.input.keyboard.addKey(Phaser.KeyCode.N);
 		//console.log(this.player);
 
     },
@@ -181,10 +183,12 @@ starCuts.Game.prototype = {
      //    }
      //
 
-		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);},this);
-		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);},this);
-		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);},this);
-		
+		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);this.bgMusic.stop();},this);
+		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);this.bgMusic.stop();},this);
+		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);this.bgMusic.stop();},this);
+		mKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel+1);this.bgMusic.stop();},this);
+		if(this.currentLevel>1)
+			nKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel-1);this.bgMusic.stop();},this);
 		invincibleTimer=(invincibleTimer>0)?invincibleTimer-1:-1;
 		if(invincibleTimer<=0)
 			spacebar.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
