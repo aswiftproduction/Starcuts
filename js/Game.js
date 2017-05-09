@@ -28,6 +28,7 @@ var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
                 ['tossingguy'],
                 ['borednpc','blank','phoneguy','blank','talking_r',],
     ["blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","talking_r","borednpc","talking_r","talking_l","blank","phoneguy","talking_l","blank","blank","talking_r","talking_l","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","talking_r","talking_l","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","borednpc","talking_l","blank","blank","pinknpc","talking_l","blank","blank","blank","blank...blank","blank","blank","blank","pacingguy","blank","talking_r","tossingguy","talking_l","blank","blank","blank","talking_r","pinknpc","talking_l","blank","borednpc","talking_l","blank","phoneguy","talking_l","blank","blank","blank","phoneguy","talking_l","blank","blank","blank","tossingguy","pinknpc","borednpc","talking_l","blank","blank","blank","blank","blank","blank","phoneguy","talking_l","blank","pacingguy","blank","talking_r","phoneguy","talking_l","blank","blank","blank","tossingguy","phoneguy","talking_l","blank","pacingguy","blank","blank","talking_r","talking_l","blank","blank","blank","blank","phoneguy","phoneguy","talking_l","blank","talking_r","talking_l","blank","phoneguy","phoneguy","pacingguy","blank","talking_r","talking_l","blank","blank","blank","blank","talking_r","pacingguy","blank","tossingguy","tossingguy","phoneguy","talking_l","blank","blank","tossingguy","phoneguy","talking_l","blank","phoneguy","talking_l","blank","blank","blank","blank","boredguy","blank"]];
+
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he isn't looking at his phone"];
@@ -164,12 +165,13 @@ starCuts.Game.prototype = {
 		this.loseSound=this.game.add.audio('oww');
 
 		this.bgMusic.play();
-
 		
 		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
 		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
 		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
 		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+		mKey=this.game.input.keyboard.addKey(Phaser.KeyCode.M);
+		nKey=this.game.input.keyboard.addKey(Phaser.KeyCode.N);
 		//console.log(this.player);
 
     },
@@ -186,10 +188,12 @@ starCuts.Game.prototype = {
      //    }
      //
 
-		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);},this);
-		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);},this);
-		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);},this);
-		
+		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);this.bgMusic.stop();},this);
+		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);this.bgMusic.stop();},this);
+		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);this.bgMusic.stop();},this);
+		mKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel+1);this.bgMusic.stop();},this);
+		if(this.currentLevel>1)
+			nKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel-1);this.bgMusic.stop();},this);
 		invincibleTimer=(invincibleTimer>0)?invincibleTimer-1:-1;
 		if(invincibleTimer<=0)
 			spacebar.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
@@ -242,7 +246,9 @@ starCuts.Game.prototype = {
         if (this.hitPlatform) {
             var hasLost = false;
             hasLanded = true;
-			this.checkLand();
+			if(!isInvincible){
+				this.checkLand();
+			}
 
         }
 
@@ -561,8 +567,9 @@ starCuts.Game.prototype = {
                 this.alpha = 0.8;
             }, mainMenu);
             mainMenu.events.onInputDown.add(function() {
+				this.bgMusic.stop();
                 starCuts.game.state.start('MainMenu');
-            }, mainMenu);
+            }, this);
 
             levelSelect = this.game.add.sprite(menu.x, menu.y + 120, 'level select b');
             levelSelect.anchor.setTo(0.5,0.5);
