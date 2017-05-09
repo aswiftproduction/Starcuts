@@ -486,7 +486,7 @@ starCuts.Game.prototype = {
 		this.player.inputEnabled = false;
 		this.player.body.gravity.y = 0;
 		this.loseSound.play();
-
+        this.game.physics.arcade.isPaused=true;
 		gameOver=true;
 
 	},
