@@ -4,6 +4,7 @@ starCuts.Game = function () {
 };
 
 var hasJumped = false;
+var hasnudged = false;
 var gameOver=false;
 var gameWon=false;
 var winsize=300;
@@ -22,7 +23,8 @@ var invincibleTimer=-1;
 var levelsArray=[['pinknpc', 'blank','blank','borednpc', 'blank'],
 				['phoneguy', 'blank', 'blank', 'pinknpc', 'blank','borednpc','blank'],
 				['phoneguy', 'blank', 'borednpc','blank', 'blank', 'phoneguy', 'blank','pinknpc', 'blank','pacingguy', 'blank','borednpc'],
-				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','blank', 'borednpc']];
+				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','blank', 'borednpc'],
+                ["blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","talking_r","borednpc","talking_r","talking_l","blank","phoneguy","talking_l","blank","blank","talking_r","talking_l","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","talking_r","talking_l","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","borednpc","talking_l","blank","blank","pinknpc","talking_l","blank","blank","blank","blank...blank","blank","blank","blank","pacingguy","blank","talking_r","tossingguy","talking_l","blank","blank","blank","talking_r","pinknpc","talking_l","blank","borednpc","talking_l","blank","phoneguy","talking_l","blank","blank","blank","phoneguy","talking_l","blank","blank","blank","tossingguy","pinknpc","borednpc","talking_l","blank","blank","blank","blank","blank","blank","phoneguy","talking_l","blank","pacingguy","blank","talking_r","phoneguy","talking_l","blank","blank","blank","tossingguy","phoneguy","talking_l","blank","pacingguy","blank","blank","talking_r","talking_l","blank","blank","blank","blank","phoneguy","phoneguy","talking_l","blank","talking_r","talking_l","blank","phoneguy","phoneguy","pacingguy","blank","talking_r","talking_l","blank","blank","blank","blank","talking_r","pacingguy","blank","tossingguy","tossingguy","phoneguy","talking_l","blank","blank","tossingguy","phoneguy","talking_l","blank","phoneguy","talking_l","blank","blank","blank","blank","boredguy","blank"]];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he isn't looking at his phone"];
@@ -209,6 +211,7 @@ starCuts.Game.prototype = {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
             hasJumped = false;
+            hasnudged = false;
             //this.player.animations.stop();
             if (hasJumped && !this.game.input.mousePointer.isDown) {
                 this.player.animations.stop();
@@ -592,19 +595,19 @@ starCuts.Game.prototype = {
     },
     nudge: function() {
 
-        if(!this.hitPlatform) {
-
-            var velocityOffset = 500;
+        if(!this.hitPlatform && !hasnudged) {
+            hasnudged = true;
+            var velocityOffset = 100;
             if (this.player.x - this.game.camera.x >  this.game.input.x) {
                 console.log("The Player's X is > the mouse move forward Player X:" + this.player.x + "Mouse X" + this.game.input.x);
-                this.player.body.velocity.x += velocityOffset;
-                this.player.body.velocity.y = 100;
+                this.player.body.velocity.x = this.player.body.velocity.x* 0.5 + velocityOffset;
+                this.player.body.velocity.y = -500;
 
             }
             else {
                 console.log("The Player's X is < than the mouse, move back Player X:" + this.player.x + "Mouse X" + this.game.input.x);
-                this.player.body.velocity.x -= velocityOffset;
-                this.player.body.velocity.y = 100;
+                this.player.body.velocity.x = 0 - velocityOffset;
+                this.player.body.velocity.y = -500;
             }
 
         }
