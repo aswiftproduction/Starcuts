@@ -19,7 +19,7 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['blank', 'blank','tossingguy','blank', 'blank'],
+var levelsArray=[['pinknpc', 'blank','blank','borednpc', 'blank'],
 				['phoneguy', 'blank', 'borednpc', 'pinknpc', 'blank','borednpc','borednpc','talking_l'],
 				['phoneguy', 'blank', 'borednpc','pacingguy', 'blank', 'phoneguy', 'blank','pinknpc', 'blank','pinknpc', 'blank','pinknpc'],
 				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','pinknpc', 'borednpc']];
@@ -33,6 +33,13 @@ var levelJson=[{enemies:['blank'],
                {enemies:['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
                 text:"Cut the guy when he isn't looking at his phone."},
 ];
+
+var loseTextArray=[];
+loseTextArray["PhoneGuy"] = "The guy behind you saw you cut!";
+loseTextArray["Collision"] = "You collided with another person!";
+loseTextArray["TossingGuy"] = "You collided with the guy's phone!";
+loseTextArray["OutOfBounds"] = "You have fallen out of bounds!";
+
 
 starCuts.Game.prototype = {
 
@@ -187,6 +194,7 @@ starCuts.Game.prototype = {
 		
 		if(gameOver){
 			this.game.input.onDown.add(this.restart,this);
+
 			return;
 		}
         //  Collide the player with the platforms
@@ -217,7 +225,7 @@ starCuts.Game.prototype = {
             this.hasWon();
         }
         if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
-            this.hitPatron(this.player, null);
+            this.hitPatron(this.player, null,loseTextArray["OutOfBounds"]);
         }
 
 
@@ -265,7 +273,7 @@ starCuts.Game.prototype = {
 				x=lossPositions[i];
 				if(x[0]<=xValue && x[1]>xValue){
 					console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
-					this.hitPatron(this.player,null);
+					this.hitPatron(this.player,null,loseTextArray["PhoneGuy"]);
 				}
 			}
 			/*
@@ -460,9 +468,13 @@ starCuts.Game.prototype = {
 
         return position;
     },
-	hitPatron: function(player, patron){
+	hitPatron: function(player, patron, text){
 		console.log("you lose");
-		this.gameOverText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'Game Over\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
+
+		if(!text) {
+            text = loseTextArray["Collision"];
+        }
+		this.gameOverText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'Game Over\n' + text + '\nClick to restart', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameOverText.anchor.setTo(0.5,0.5);
 		this.player.body.velocity.x = 0;
 		this.player.body.velocity.y = 0;
@@ -471,8 +483,10 @@ starCuts.Game.prototype = {
 		this.loseSound.play();
 
 		gameOver=true;
+        this.game.physics.arcade.isPaused=true;
 	},
 	restart: function(self){
+        this.game.physics.arcade.isPaused=false;
 		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
 		this.bgMusic.stop();
 		gameOver=false;
