@@ -562,6 +562,7 @@ starCuts.Game.prototype = {
                 this.alpha = 0.8;
             }, mainMenu);
             mainMenu.events.onInputDown.add(function() {
+				this.bgMusic.stop();
                 starCuts.game.state.start('MainMenu');
             }, mainMenu);
 
