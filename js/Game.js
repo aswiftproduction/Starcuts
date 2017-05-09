@@ -98,7 +98,9 @@ starCuts.Game.prototype = {
 		
 		//add lamps
 		this.drawLamps(200, 30);
-		
+
+        //add menu button
+        this.inGameMenu();
 		//add cashier
 		this.game.add.sprite(worldBound-170, this.game.world.height - 64-156, 'cashier');
 		
@@ -450,7 +452,75 @@ starCuts.Game.prototype = {
 			else
 				this.game.add.sprite(leftOffset+(i*distToNext), -40, 'topLamp');
 		}
-	}
+	},
+
+    inGameMenu: function(){
+	    inGameMenu = this.game.add.sprite(10, 60 , 'menu');
+        inGameMenu.fixedToCamera = true;
+        inGameMenu.alpha = 0.5;
+        inGameMenu.inputEnabled = true;
+        inGameMenu.events.onInputOver.add(function () {
+            this.alpha = 1;
+        }, inGameMenu);
+        inGameMenu.events.onInputOut.add(function () {
+            this.alpha = 0.8;
+        }, inGameMenu);
+
+
+        inGameMenu.events.onInputDown.add(function(){
+            menu = this.game.add.sprite(this.game.width/2, this.game.height/2,'pause menu');
+            menu.anchor.setTo(0.5,0.5);
+            menu.fixedToCamera = true;
+
+            mainMenu = this.game.add.sprite(menu.x, menu.y - 120, 'main menu b');
+            mainMenu.anchor.setTo(0.5,0.5);
+            mainMenu.fixedToCamera = true;
+            mainMenu.alpha = 0.5;
+            mainMenu.inputEnabled = true;
+            mainMenu.events.onInputOver.add(function () {
+                this.alpha = 1;
+            }, mainMenu);
+            mainMenu.events.onInputOut.add(function () {
+                this.alpha = 0.8;
+            }, mainMenu);
+            mainMenu.events.onInputDown.add(function() {
+                starCuts.game.state.start('MainMenu');
+            }, mainMenu);
+
+            levelSelect = this.game.add.sprite(menu.x, menu.y + 120, 'level select b');
+            levelSelect.anchor.setTo(0.5,0.5);
+            levelSelect.fixedToCamera = true;
+            levelSelect.alpha = 0.5;
+            levelSelect.inputEnabled = true;
+            levelSelect.events.onInputOver.add(function () {
+                this.alpha = 1;
+            }, levelSelect);
+            levelSelect.events.onInputOut.add(function () {
+                this.alpha = 0.8;
+            }, levelSelect);
+            levelSelect.events.onInputDown.add(function() {
+                starCuts.game.state.start('LevelSelect')
+            }, levelSelect);
+
+            exit = this.game.add.sprite(250,120, 'exit');
+            exit.fixedToCamera = true;
+            exit.alpha = 0.5;
+            exit.inputEnabled = true;
+            exit.events.onInputOver.add(function () {
+                this.alpha = 1;
+            }, exit);
+            exit.events.onInputOut.add(function () {
+                this.alpha = 0.8;
+            }, exit);
+            exit.events.onInputDown.add(function() {
+                levelSelect.destroy();
+                mainMenu.destroy();
+                menu.destroy();
+                exit.destroy();
+            }, exit);
+        }, this);
+
+    },
 
 
 };
