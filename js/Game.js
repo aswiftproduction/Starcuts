@@ -48,6 +48,8 @@ loseTextArray["PhoneGuy"] = "The guy behind you saw you cut!";
 loseTextArray["Collision"] = "You collided with another person!";
 loseTextArray["TossingGuy"] = "You collided with the guy's phone!";
 loseTextArray["OutOfBounds"] = "You have fallen out of bounds!";
+var progress;
+
 
 
 starCuts.Game.prototype = {
@@ -68,6 +70,13 @@ starCuts.Game.prototype = {
 
     create: function () {
         //this.background = this.game.add.sprite(0, 0, 'background');
+		progress = this.game.add.image(0, 0, "preloadbar");
+		console.log(progress);
+		progress.fixedToCamera=true;
+		progress.width = 0;
+		progress.initialWidth = 1280 // the original image width in pixels
+		// then on updateprogress.width = percentDone*progress.initialWidth; 
+		// percentDone should be in decimals 20% = 0.2// so this will finaly result in 1 * 300 = 100%
 		lossPositions=[];
 		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset+winsize;
 		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
@@ -190,7 +199,8 @@ starCuts.Game.prototype = {
      //        this.game.debug.body(this.lineGroup.children[i]);
      //    }
      //
-
+		progress.width = (this.player.x/(worldBound)) * progress.initialWidth;
+		
 		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);this.bgMusic.stop();},this);
 		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);this.bgMusic.stop();},this);
 		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);this.bgMusic.stop();},this);
@@ -586,8 +596,9 @@ starCuts.Game.prototype = {
                 this.alpha = 0.8;
             }, levelSelect);
             levelSelect.events.onInputDown.add(function() {
+				this.bgMusic.stop();
                 starCuts.game.state.start('LevelSelect')
-            }, levelSelect);
+            }, this);
 
             exit = this.game.add.sprite(250,120, 'exit');
             exit.fixedToCamera = true;
