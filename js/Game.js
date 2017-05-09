@@ -237,7 +237,9 @@ starCuts.Game.prototype = {
         if (this.hitPlatform) {
             var hasLost = false;
             hasLanded = true;
-			this.checkLand();
+			if(!isInvincible){
+				this.checkLand();
+			}
 
         }
 
