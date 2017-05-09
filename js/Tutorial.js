@@ -17,7 +17,7 @@ starCuts.Tutorial.prototype =
             if (index == 1)
                 starCuts.game.state.start('MainMenu');
             else {
-                index++;
+                index--;
                 this.trans(index);
             }
         },
