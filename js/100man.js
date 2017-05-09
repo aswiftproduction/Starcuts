@@ -47,7 +47,7 @@ function pushPerson(numPeap) {
         if (specialRan(numPeap)) {
             var specialguy = (special[ranInt(0, 2)]);
             if (numPeople === 99) {
-                ranArray.push('boredguy');
+                ranArray.push('borednpc');
                 numPeople++;
             }else if (specialguy === 'pacingguy'){
                 ranArray.push(specialguy);
