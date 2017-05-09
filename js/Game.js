@@ -20,11 +20,14 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['pinknpc', 'blank','blank','borednpc', 'blank'],
-				['phoneguy', 'blank', 'blank', 'pinknpc', 'blank','borednpc','blank'],
-				['phoneguy', 'blank', 'borednpc','blank', 'blank', 'phoneguy', 'blank','pinknpc', 'blank','pacingguy', 'blank','borednpc'],
-				['phoneguy', 'blank','borednpc', 'pacingguy', 'blank','blank', 'blank','pinknpc', 'blank','blank', 'borednpc'],
-                ["blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","talking_r","borednpc","talking_r","talking_l","blank","phoneguy","talking_l","blank","blank","talking_r","talking_l","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","talking_r","talking_l","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","borednpc","talking_l","blank","blank","pinknpc","talking_l","blank","blank","blank","blank...blank","blank","blank","blank","pacingguy","blank","talking_r","tossingguy","talking_l","blank","blank","blank","talking_r","pinknpc","talking_l","blank","borednpc","talking_l","blank","phoneguy","talking_l","blank","blank","blank","phoneguy","talking_l","blank","blank","blank","tossingguy","pinknpc","borednpc","talking_l","blank","blank","blank","blank","blank","blank","phoneguy","talking_l","blank","pacingguy","blank","talking_r","phoneguy","talking_l","blank","blank","blank","tossingguy","phoneguy","talking_l","blank","pacingguy","blank","blank","talking_r","talking_l","blank","blank","blank","blank","phoneguy","phoneguy","talking_l","blank","talking_r","talking_l","blank","phoneguy","phoneguy","pacingguy","blank","talking_r","talking_l","blank","blank","blank","blank","talking_r","pacingguy","blank","tossingguy","tossingguy","phoneguy","talking_l","blank","blank","tossingguy","phoneguy","talking_l","blank","phoneguy","talking_l","blank","blank","blank","blank","boredguy","blank"]];
+var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
+				['blank', 'blank', 'blank', 'pinknpc', 'blank','borednpc','blank'],
+				['phoneguy', 'blank', 'borednpc','blank', 'talking_r'],
+				['blank', 'blank','borednpc','blank', 'pacingguy','blank','blank','talking_l','blank', 'borednpc','pinknpc', 'talking_l','blank', 'borednpc'],
+                ['phoneguy','blank','borednpc','pacingguy','pinknpc','talking_l','blank','borednpc'],
+                ['tossingguy'],
+                ['borednpc','blank','phoneguy','blank','talking_r',],
+    ["blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","talking_r","talking_l","blank","blank","talking_r","borednpc","talking_r","talking_l","blank","phoneguy","talking_l","blank","blank","talking_r","talking_l","blank","blank","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","pinknpc","talking_l","blank","blank","talking_r","talking_l","blank","blank","borednpc","talking_l","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","blank","borednpc","talking_l","blank","blank","borednpc","talking_l","blank","blank","pinknpc","talking_l","blank","blank","blank","blank...blank","blank","blank","blank","pacingguy","blank","talking_r","tossingguy","talking_l","blank","blank","blank","talking_r","pinknpc","talking_l","blank","borednpc","talking_l","blank","phoneguy","talking_l","blank","blank","blank","phoneguy","talking_l","blank","blank","blank","tossingguy","pinknpc","borednpc","talking_l","blank","blank","blank","blank","blank","blank","phoneguy","talking_l","blank","pacingguy","blank","talking_r","phoneguy","talking_l","blank","blank","blank","tossingguy","phoneguy","talking_l","blank","pacingguy","blank","blank","talking_r","talking_l","blank","blank","blank","blank","phoneguy","phoneguy","talking_l","blank","talking_r","talking_l","blank","phoneguy","phoneguy","pacingguy","blank","talking_r","talking_l","blank","blank","blank","blank","talking_r","pacingguy","blank","tossingguy","tossingguy","phoneguy","talking_l","blank","blank","tossingguy","phoneguy","talking_l","blank","phoneguy","talking_l","blank","blank","blank","blank","boredguy","blank"]];
 var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he isn't looking at his phone"];
@@ -47,6 +50,8 @@ starCuts.Game.prototype = {
 
     init: function(currentLevel){
         //initiaites state with a specified level
+        if (currentLevel == 12)
+            levelsArray[11] = array100();
         this.currentLevel = currentLevel;
 		console.log("current level: "+this.currentLevel);
 		if(this.currentLevel>levelsArray.length || this.currentLevel<1)

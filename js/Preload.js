@@ -35,10 +35,10 @@ starCuts.Preload.prototype = {
     this.game.load.spritesheet('tossingguy', 'assets/tossing_guy_sprite.png',56,112);
 	this.game.load.image('topLamp', 'assets/topLamp.png');
 	this.game.load.image('cashier', 'assets/Cashier_Desk.png');
-	this.game.load.audio('jump','assets/jump.wav');
-	this.game.load.audio('win','assets/win.wav');
+	this.game.load.audio('jump','assets/jump.mp3');
+	this.game.load.audio('win','assets/win.mp3');
 	this.game.load.audio('bgmusic', 'assets/background_music.mp3');
-	this.game.load.audio('oww','assets/oww.wav');
+	this.game.load.audio('oww','assets/oww.mp3');
 	this.game.load.image('phone', 'assets/phone.png');
 	this.game.load.image('next','assets/next.png');
 	this.game.load.image('previous','assets/previous.png');

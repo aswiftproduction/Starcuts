@@ -50,11 +50,13 @@ starCuts.LevelSelect.prototype =
 
                 //Create numbering on sprites
                 this.levelNum = this.game.add.text(this.cup.x + this.cup.width/2.5 ,this.cup.y + this.cup.height/2, level, { font: "54px MV Boli", fill: "#ffffff", wordWrap: true, align: "center" });
+                if(level == 12)
+                    this.levelNum.text = '???';
                 this.levelNum.anchor.set(0.5);
                 this.cup.alpha = 0.15;
 
                 //Hightlight on mouseover
-                if (level>0&& level<=5) {
+                if ((level>0&& level<=4) || level == 12) {
                     this.cup.alpha = 0.5;
                     this.cup.inputEnabled = true;
                     this.cup.events.onInputOver.add(function () {
