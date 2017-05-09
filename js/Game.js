@@ -159,7 +159,6 @@ starCuts.Game.prototype = {
 		this.loseSound=this.game.add.audio('oww');
 
 		this.bgMusic.play();
-
 		
 		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
 		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
@@ -564,7 +563,7 @@ starCuts.Game.prototype = {
             mainMenu.events.onInputDown.add(function() {
 				this.bgMusic.stop();
                 starCuts.game.state.start('MainMenu');
-            }, mainMenu);
+            }, this);
 
             levelSelect = this.game.add.sprite(menu.x, menu.y + 120, 'level select b');
             levelSelect.anchor.setTo(0.5,0.5);
