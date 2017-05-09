@@ -65,7 +65,7 @@ starCuts.Game.prototype = {
 
 
 
-
+        this.game.input.onDown.add(this.nudge,this);
 
 
 		//renders sprites in the lineGroup
@@ -219,6 +219,8 @@ starCuts.Game.prototype = {
         if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
             this.hitPatron(this.player, null);
         }
+
+
 
 
         if (this.hitPlatform) {
@@ -573,16 +575,25 @@ starCuts.Game.prototype = {
     },
     nudge: function() {
 
-        var velocityOffset = 10;
-	    if (this.player.x > this.game.input.mousePointer.x) {
+        if(!this.hitPlatform) {
 
-	        this.player.velocity.x += velocityOffset;
+            var velocityOffset = 500;
+            if (this.player.x - this.game.camera.x >  this.game.input.x) {
+                console.log("The Player's X is > the mouse move forward Player X:" + this.player.x + "Mouse X" + this.game.input.x);
+                this.player.body.velocity.x += velocityOffset;
+                this.player.body.velocity.y = 100;
+
+            }
+            else {
+                console.log("The Player's X is < than the mouse, move back Player X:" + this.player.x + "Mouse X" + this.game.input.x);
+                this.player.body.velocity.x -= velocityOffset;
+                this.player.body.velocity.y = 100;
+            }
+
         }
+
         else {
-
-	        this.player.velocity.x -= velocityOffset;
+            console.log("Hitting the platform, cannot nudge");
         }
-
-
     }
 };
