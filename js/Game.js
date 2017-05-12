@@ -21,7 +21,7 @@ var isInvincible=false;
 var invincibleTimer=-1;
 
 var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
-				['blank', 'tallguy', 'blank', 'pinknpc', 'blank','borednpc','blank'],
+				['blank', 'tallguy', 'sleepingguy', 'blank', 'pinknpc', 'blank','borednpc','blank'],
 				['phoneguy', 'blank', 'borednpc','blank', 'talking_r'],
 				['blank', 'blank','borednpc','blank', 'pacingguy','blank','blank','talking_l','blank', 'borednpc','pinknpc', 'talking_l','blank', 'borednpc'],
                 ['phoneguy','blank','borednpc','pacingguy','pinknpc','talking_l','blank','borednpc'],
@@ -169,7 +169,7 @@ starCuts.Game.prototype = {
         this.player.events.onDragUpdate.add(this.onDragUpdate,this);
 		this.player.events.onDragStart.add(this.onDragStart,this);
 		this.game.world.bringToTop(this.levelText);
-		
+
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
 
@@ -190,14 +190,14 @@ starCuts.Game.prototype = {
     update: function () {
 
      //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
-        this.game.debug.bodyInfo(this.player,80,112);
-        this.game.debug.body(this.player);
-
-        for (var i = 0; i < this.lineGroup.length; i++) {
-
-            this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
-            this.game.debug.body(this.lineGroup.children[i]);
-        }
+     //    this.game.debug.bodyInfo(this.player,80,112);
+     //    this.game.debug.body(this.player);
+     //
+     //    for (var i = 0; i < this.lineGroup.length; i++) {
+     //
+     //        this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
+     //        this.game.debug.body(this.lineGroup.children[i]);
+     //    }
 
 		progress.width = (this.player.x/(worldBound)) * progress.initialWidth;
 		
@@ -364,6 +364,11 @@ starCuts.Game.prototype = {
 
                     var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
                     LineObject.body.setSize(45,100,5,0);
+
+                }else if (array[i] === "sleepingguy") {
+
+                    var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 120, array[i]);
+                    LineObject.body.setSize(95,45,10,10);
 
                 }
                 else {
@@ -537,6 +542,9 @@ starCuts.Game.prototype = {
 	},
 	hasWon: function(){
 		console.log("you win");
+		this.coffee = this.game.add.sprite(this.player.x - 42, this.player.y - 130, 'coffee');
+		this.coffee.animations.add('win',[0,1,2,3],10, true);
+		this.coffee.animations.play('win');
 		this.gameWonText = this.game.add.text(this.game.camera.x+640, this.game.world.centerY, 'You Win\nClick to move on to next level', { fontSize: '32px', fill: '#000', align:"center" });
 		this.gameWonText.anchor.setTo(0.5,0.5);
         this.game.physics.arcade.isPaused=true;

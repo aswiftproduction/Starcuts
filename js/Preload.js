@@ -30,6 +30,8 @@ starCuts.Preload.prototype = {
     this.game.load.image('talking_l', 'assets/npc_talking_l.png');
     this.game.load.image('talking_r', 'assets/npc_talking_r.png');
     this.game.load.image('tallguy', 'assets/tall_guy.png');
+    this.game.load.image('sleepingguy', 'assets/sleepingguy.png');
+    this.game.load.spritesheet('coffee','assets/coffee.png',100,100);
     this.game.load.spritesheet('phoneguy', 'assets/phone_guy_sprite.png',61,112);
     this.game.load.spritesheet('pacingguy', 'assets/pacing_guy_sprite.png',48,107);
     this.game.load.spritesheet('tossingguy', 'assets/tossing_guy_sprite.png',56,112);

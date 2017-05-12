@@ -6,7 +6,9 @@ var numPeople = 0;
 
 var ranArray = ['blank'];
 
-var norm = ['pinknpc','borednpc','talking_r'];
+var norm = ['pinknpc','borednpc','talking_r','tallguy'];
+
+var stop = ['talking_l', 'sleepingguy']
 
 var special = ['tossingguy','pacingguy','phoneguy'];
 
@@ -38,7 +40,7 @@ function pushPerson(numPeap) {
         if (ranArray[ranArray.length - 1] === 'blank') {
             ranArray.push('blank');
         }else{
-            ranArray.push('talking_l');
+            ranArray.push(stop[ranInt(0,1)]);
             numPeople++;
             ranArray.push('blank');
         }
