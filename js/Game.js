@@ -3,7 +3,6 @@ var starCuts = starCuts || {};
 starCuts.Game = function () {
 };
 
-var hasJumped = false;
 var hasnudged = false;
 var gameOver=false;
 var gameWon=false;
@@ -194,7 +193,7 @@ starCuts.Game.prototype = {
 		else
 			this.lineGroup.alpha=1;
 		
-		//adds event handler for level restarting on lose/win
+		//adds event handler for level restarting on lose/win, prevents other checks from occuring
 		if(gameOver){
 			this.game.input.onDown.add(this.restart,this);
 			return;
@@ -206,40 +205,42 @@ starCuts.Game.prototype = {
 			this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
 		}
 
-        //Animation controls for player
+        //if touching the ground
         if (this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
-            hasJumped = false;
+			//reste nudge ability
             hasnudged = false;
-            if (!hasJumped && !this.game.input.mousePointer.isDown && this.player.x != 250) {
+			
+			//TODO: this better
+			//if not clicking or at start point set frame to laded pose
+            if (!this.game.input.mousePointer.isDown && this.player.x != 250) {
                 this.player.animations.stop();
                 this.player.frame = 0;
-            } else if (!this.game.input.mousePointer.isDown) {
+            }
+			//if still at start point have default pose
+			else if (!this.game.input.mousePointer.isDown) {
                 this.player.animations.stop();
                 this.player.frame = 1;
-            } else if (this.game.input.mousePointer.isDown) {
-                //this.player.animations.play('crouch');
             }
-        }
-		//defines the win condition, get to the end of the stage
-        if (this.hitPlatform && !gameOver && this.player.x - this.game.camera.x >= startWinX && this.player.x - this.game.camera.x <= endWinX) {
-            this.hasWon();
-        }
-		//defiens an unused loose condition
-        if (this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
-            this.hitPatron(this.player, null,loseTextArray["OutOfBounds"]);
-        }
-		
-		//calls checkLand if the player has just landed
-        if (this.hitPlatform) {
-            var hasLost = false;
-            hasLanded = true;
-			if(!isInvincible){
-				this.checkLand();
+			
+			//if the game is not over yet
+			if(!gameOver){
+				//check win condition
+				if(((this.player.x-this.game.camera.x)>=startWinX) && ((this.player.x-this.game.camera.x)<=endWinX)){
+					this.hasWon();
+				}
+				//check (unused) lose condition
+				/*else if((this.player.x-this.game.camera.x)>endWinX){
+					this.hitPatron(this.player, null,loseTextArray["OutOfBounds"]);
+				}*/
+				//calls checkLand (lose if phoneGuy)
+				else if(!isInvincible){
+					this.checkLand();
+				}
 			}
         }
-
+		
 		//iterates over all enemies
         for (var x = 0; x < this.lineGroup.length; x++){
         	//Pacing guy
@@ -280,16 +281,18 @@ starCuts.Game.prototype = {
     },
 	//When the player finished dragging, jump
     onDragStop: function(sprite, pointer) {
-        lineDrawer.clear();
-        var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
-        var ydiff = sprite.position.y - pointer.y;
-        //console.log((ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200));
-        sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
-        sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
-        hasJumped = true;
-		this.player.animations.play('fly');
-		this.jumpSound.play();
-		isChecking = false;
+		//disables double jump unless cheats are activated
+		if(isInvincible || this.hitPlatform){
+			lineDrawer.clear();
+			var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
+			var ydiff = sprite.position.y - pointer.y;
+			//console.log((ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200));
+			sprite.body.velocity.x = (xdiff/Math.abs(xdiff))*Math.min(10*Math.abs(xdiff),500);
+			sprite.body.velocity.y = (ydiff/Math.abs(ydiff))*Math.min(10*Math.abs(ydiff),1200);
+			this.player.animations.play('fly');
+			this.jumpSound.play();
+			isChecking = false;
+		}
     },
 	//Displays arrow aprroximately proportional to player's launch velocity
     onDragUpdate: function (sprite,pointer) {
@@ -348,14 +351,12 @@ starCuts.Game.prototype = {
 
 
     },
-
 	//sets up each phoneGuy's timer loop for checing their phone
     phoneGuyAnimationController: function(phoneGuy,delay,lineNumber) {
         timer = this.game.time.create();
         timer.loop(delay * 200 * this.game.rnd.integerInRange(4,9),this.phoneGuyTimerFunction,this,phoneGuy,phoneGuy.x,lineNumber);
         timer.start();
     },
-
 	//called whe phoneguy switches between checking and not checking his phone
     phoneGuyTimerFunction: function (phoneGuy,xPosition,lineNumber) {
         if(phoneGuy.lookUp) {
@@ -395,7 +396,7 @@ starCuts.Game.prototype = {
 		}
 		
 	},
-
+	//adds behavior and animations to all enemies
     generateLineObjectAnimation: function (lineGroup) {
         var numPhoneGuys = 0;
         for ( var i = 0; i < lineGroup.length; i++) {
@@ -486,7 +487,6 @@ starCuts.Game.prototype = {
 		this.bgMusic.stop();
 		gameOver=false;
 		gameWon=false;
-		hasJumped=false;
 		starCuts.game.state.start('Game',true,false, goToLevel);
 	},
 	//pauses physics adds congratulatory text and displays a winning animation/sound

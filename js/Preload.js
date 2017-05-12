@@ -8,6 +8,7 @@ starCuts.Preload.prototype = {
     //show loading screen
     this.preloadBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY + 128, 'preloadbar');
     this.preloadBar.anchor.setTo(0.5);
+	this.preloadBar.scale.setTo(10,2);
     this.load.setPreloadSprite(this.preloadBar);
  
     //load game assets
