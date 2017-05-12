@@ -232,11 +232,12 @@ starCuts.Game.prototype = {
         if (/*this.player.body.touching.down && */this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
+            //this.player.animations.stop();
             hasJumped = false;
             hasnudged = false;
-            //this.player.animations.stop();
-            if (hasJumped && !this.game.input.mousePointer.isDown) {
+            if (!hasJumped && !this.game.input.mousePointer.isDown && this.player.x != 250) {
                 this.player.animations.stop();
+                console.log("Land Animation");
                 this.player.frame = 0;
             } else if (!this.game.input.mousePointer.isDown) {
                 this.player.animations.stop();
@@ -244,6 +245,7 @@ starCuts.Game.prototype = {
             } else if (this.game.input.mousePointer.isDown) {
                 //this.player.animations.play('crouch');
             }
+
         }
 
         if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x >= startWinX && this.player.x - this.game.camera.x <= endWinX) {
