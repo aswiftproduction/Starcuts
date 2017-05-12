@@ -21,7 +21,7 @@ var isInvincible=false;
 var invincibleTimer=-1;
 
 var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
-				['blank', 'blank', 'blank', 'pinknpc', 'blank','borednpc','blank'],
+				['blank', 'tallguy', 'blank', 'pinknpc', 'blank','borednpc','blank'],
 				['phoneguy', 'blank', 'borednpc','blank', 'talking_r'],
 				['blank', 'blank','borednpc','blank', 'pacingguy','blank','blank','talking_l','blank', 'borednpc','pinknpc', 'talking_l','blank', 'borednpc'],
                 ['phoneguy','blank','borednpc','pacingguy','pinknpc','talking_l','blank','borednpc'],
@@ -188,17 +188,17 @@ starCuts.Game.prototype = {
 
     },
     update: function () {
-     //
-     // //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
-     //    this.game.debug.bodyInfo(this.player,80,112);
-     //    this.game.debug.body(this.player);
-     //
-     //    for (var i = 0; i < this.lineGroup.length; i++) {
-     //
-     //        this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
-     //        this.game.debug.body(this.lineGroup.children[i]);
-     //    }
-     //
+
+     //   ===========ENABLES HIT BOX ON PLAYER AND LINEGROUP============
+        this.game.debug.bodyInfo(this.player,80,112);
+        this.game.debug.body(this.player);
+
+        for (var i = 0; i < this.lineGroup.length; i++) {
+
+            this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
+            this.game.debug.body(this.lineGroup.children[i]);
+        }
+
 		progress.width = (this.player.x/(worldBound)) * progress.initialWidth;
 		
 		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);this.bgMusic.stop();},this);
@@ -354,6 +354,16 @@ starCuts.Game.prototype = {
 
                     var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 170, array[i]);
                     LineObject.body.setSize(45,90,18,10);
+
+                }else if (array[i] === "tallguy") {
+
+                    var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 265, array[i]);
+                    LineObject.body.setSize(45,190,2,0);
+
+                }else if (array[i] === "phoneguy") {
+
+                    var LineObject = this.lineGroup.create(offsetFromLeft + i * distFromEachCell, this.game.height - 175, array[i]);
+                    LineObject.body.setSize(45,100,5,0);
 
                 }
                 else {
