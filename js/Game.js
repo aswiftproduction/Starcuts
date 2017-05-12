@@ -19,7 +19,7 @@ var isChecking = false;
 var isInvincible=false;
 var invincibleTimer=-1;
 
-var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
+var levelsArray=[['blank', 'blank','blank'],
 				['blank', 'tallguy', 'sleepingguy', 'blank', 'pinknpc', 'blank','borednpc','blank'],
 				['phoneguy', 'blank', 'borednpc','blank', 'talking_r'],
 				['blank', 'blank','borednpc','blank', 'pacingguy','blank','blank','talking_l','blank', 'borednpc','pinknpc', 'talking_l','blank', 'borednpc'],
@@ -31,11 +31,11 @@ var levelsArray=[['blank', 'blank','blank','blank', 'blank'],
                 ['pinknpc','borednpc','talking_l','blank','blank','pacingguy','blank','blank','tossingguy'],
                 ['tossingguy','tossingguy','tossingguy','tossingguy','tossingguy','tossingguy'],
                 []];
-var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)",
+var tutorialTextArray=["You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register",
 	"You don't have time to wait in line.\nJump over the patient patrons",
 	"Cut the guy when he is looking at his phone"];
 var levelJson=[{enemies:['blank'],
-                text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register\n(Press 'I' to become invincible)"},
+                text:"You're late for class and need some coffee to make it.\nClick and drag on your character to fling yourself toward the register"},
                {enemies:['blank', 'blank', 'pinknpc', 'blank'],
                 text:"Cut the guy when he is looking at his phone."},
                {enemies:['pinknpc', 'blank', 'pinknpc', 'blank', 'pinknpc'],
@@ -54,14 +54,19 @@ var progress;
 starCuts.Game.prototype = {
 
     init: function(currentLevel){
+		this.currentLevel = currentLevel;
         //initiaites state with a specified level
-        if (currentLevel == 12)
-            levelsArray[11] = array100();
-        this.currentLevel = currentLevel;
+        if (currentLevel >= 12){
+			numEnemies=Math.min(100*Math.pow(2,(currentLevel-13)),2000);
+            levelsArray[11] = array100(numEnemies);
+			this.levelText=this.game.add.text(16, 16, 'Bonus Level '+(currentLevel-11)+': '+numEnemies+ ' Enemies', { fontSize: '32px', fill: '#000' });
+		}else{
+			this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
+		}
 		console.log("current level: "+this.currentLevel);
-		if(this.currentLevel>levelsArray.length || this.currentLevel<1)
+		if(this.currentLevel<1||this.currentLevel>=100+12)
 			this.state.start('MainMenu');
-		this.levelText=this.game.add.text(16, 16, 'Level '+this.currentLevel, { fontSize: '32px', fill: '#000' });
+		
 		this.levelText.fixedToCamera = true;
 		this.tutorialText=this.game.add.text(16, 200, tutorialTextArray[currentLevel-1], { fontSize: '16px', fill: '#000' });
     },
@@ -76,7 +81,7 @@ starCuts.Game.prototype = {
 		//initialize lossPositions, used with phoneGuy
 		lossPositions=[];
 		//sets level width
-		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset+winsize;
+		tmpLevelWidth=levelsArray[this.currentLevel>=12?11:(this.currentLevel-1)].length*enemySpacing+enemyLeftOffset+winsize;
 		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
 		this.game.world.setBounds(0, 0, worldBound, this.game.height);
 		//draws the trajectory line
@@ -91,11 +96,15 @@ starCuts.Game.prototype = {
         this.game.input.onDown.add(this.nudge,this);
 
 		//renders sprites in the lineGroup
-        this.generateLevelArray(levelsArray[this.currentLevel-1], enemyLeftOffset,enemySpacing);
+        this.generateLevelArray(levelsArray[this.currentLevel>=12?11:(this.currentLevel-1)], enemyLeftOffset,enemySpacing);
 		//fills lossPositions
         for(var i = 0; i < this.lineGroup.length; i++) {
             if (this.lineGroup.children[i].key === 'phoneguy') {
-                lossPositions.push([this.lineGroup.children[i].x, this.lineGroup.children[i+1].x]);
+				if(this.lineGroup.children[i+1]!=null){
+					lossPositions.push([this.lineGroup.children[i].x, this.lineGroup.children[i+1].x]);
+				}else{
+					lossPositions.push([this.lineGroup.children[i].x, this.lineGroup.children[i].x+30]);
+				}
             }
         }
 
