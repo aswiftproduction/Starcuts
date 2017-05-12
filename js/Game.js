@@ -69,19 +69,18 @@ starCuts.Game.prototype = {
 
 
     create: function () {
-        //this.background = this.game.add.sprite(0, 0, 'background');
+        //adds level progress bar to top of level
 		progress = this.game.add.image(0, 0, "preloadbar");
-		console.log(progress);
 		progress.fixedToCamera=true;
 		progress.width = 0;
-		progress.initialWidth = 1280 // the original image width in pixels
-		// then on updateprogress.width = percentDone*progress.initialWidth; 
-		// percentDone should be in decimals 20% = 0.2// so this will finaly result in 1 * 300 = 100%
+		progress.initialWidth = 1280 
+		//initialize lossPositions, used with phoneGuy
 		lossPositions=[];
+		//sets level width
 		tmpLevelWidth=levelsArray[this.currentLevel-1].length*enemySpacing+enemyLeftOffset+winsize;
 		worldBound=tmpLevelWidth<1280?1280:tmpLevelWidth;
 		this.game.world.setBounds(0, 0, worldBound, this.game.height);
-
+		//draws the trajectory line
         lineDrawer = this.game.add.graphics(0,0);
         lineDrawer.beginFill(0x21922C);
         lineDrawer.lineStyle(7,0x21922C,0);
@@ -89,46 +88,35 @@ starCuts.Game.prototype = {
         //Initialize and load LineGroup
         this.lineGroup = this.game.add.group();
 		this.lineGroup.enableBody = true;
-
-
-
+		//adds nudge event handler
         this.game.input.onDown.add(this.nudge,this);
-
 
 		//renders sprites in the lineGroup
         this.generateLevelArray(levelsArray[this.currentLevel-1], enemyLeftOffset,enemySpacing);
-
+		//fills lossPositions
         for(var i = 0; i < this.lineGroup.length; i++) {
-
-
             if (this.lineGroup.children[i].key === 'phoneguy') {
                 lossPositions.push([this.lineGroup.children[i].x, this.lineGroup.children[i+1].x]);
-                console.log(lossPositions);
             }
-
         }
 
-
+		//sets all enemy animations and behavior
         this.generateLineObjectAnimation(this.lineGroup);
-        //  The platforms group contains the ground and the 2 ledges we can jump on
-        //this.platforms = this.game.add.group();
-        //  We will enable physics for any object that is created in this group
 
-	    //this.platforms.enableBody = true;
         // Here we create the ground.
 		this.ground = this.add.tileSprite(0,this.game.height-64,this.game.world.width,0,'floor');
 		this.game.physics.arcade.enable(this.ground);
         this.ground.enableBody = true;
-        //  This stops it from falling away when you jump on it
+        //This stops it from falling away when you jump on it
         this.ground.body.immovable = true;
 		this.ground.body.allowGravity = false;
 		
-		//add lamps
+		//add decorative lamps
 		this.drawLamps(200, 30);
 
         //add menu button
         this.inGameMenu();
-		//add cashier
+		//add cashier at end of level
 		this.game.add.sprite(worldBound-170, this.game.world.height - 64-156, 'cashier');
 		
         // The player and its settings
@@ -145,46 +133,36 @@ starCuts.Game.prototype = {
         this.player.body.bounce.y = 0.1;
         this.player.body.gravity.y = 1300;
         this.player.body.collideWorldBounds = true;
-        //this.player.scale.setTo(2, 2);
 		
 		//have camera follow player
 		this.game.camera.follow(this.player);
-        //  Our two animations, walking left and right.
-        //TODO consider jumping/landing animations
+        //Our two animations
         this.player.animations.add('crouch', [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25], 24, false);
         this.player.animations.add('fly', [26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,45,46,47,48,49], 24, true);
-
-        //resizes the game world to match the layer dimensions
-        //this.backgroundlayer.resizeWorld();
-
-        //move player with cursor keys
-        this.cursors = this.game.input.keyboard.createCursorKeys();
-
-        //working on new jump
+        //allow drag input on player
         this.player.inputEnabled = true;
         this.player.input.enableDrag();
         //prevent player from actually moving
         this.player.input.setDragLock(false, false);
+		//set up jumping events
         this.player.events.onDragStop.add(this.onDragStop, this);
         this.player.events.onDragUpdate.add(this.onDragUpdate,this);
 		this.player.events.onDragStart.add(this.onDragStart,this);
+		
+		//add level number to top-right of level
 		this.game.world.bringToTop(this.levelText);
-
+		
+		//add sounds
 		this.jumpSound=this.game.add.audio('jump');
 		this.winSound=this.game.add.audio('win');
-
 		this.bgMusic=this.game.add.audio('bgmusic');
 		this.loseSound=this.game.add.audio('oww');
-
 		this.bgMusic.play();
 		
-		spacebar=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
-		numpadKey3=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_3);
-		numpadKey1=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_1);
-		numpadKey2=this.game.input.keyboard.addKey(Phaser.KeyCode.NUMPAD_2);
+		//setup debug keys
+		invincibilityKey=this.game.input.keyboard.addKey(Phaser.KeyCode.I);
 		mKey=this.game.input.keyboard.addKey(Phaser.KeyCode.M);
 		nKey=this.game.input.keyboard.addKey(Phaser.KeyCode.N);
-		//console.log(this.player);
 
     },
     update: function () {
@@ -198,46 +176,44 @@ starCuts.Game.prototype = {
      //        this.game.debug.bodyInfo(this.lineGroup.children[i],80,112);
      //        this.game.debug.body(this.lineGroup.children[i]);
      //    }
-
-		progress.width = (this.player.x/(worldBound)) * progress.initialWidth;
+		//sets progress bar
+		progress.width = (this.player.x/(worldBound-winsize)) * progress.initialWidth;
 		
-		numpadKey1.onUp.add(function(){starCuts.game.state.start('Game',true,false, 1);this.bgMusic.stop();},this);
-		numpadKey2.onUp.add(function(){starCuts.game.state.start('Game',true,false, 2);this.bgMusic.stop();},this);
-		numpadKey3.onUp.add(function(){starCuts.game.state.start('Game',true,false, 3);this.bgMusic.stop();},this);
+		//DEBUG KEY EVENT HANDLERS
+		//sets m and n keys to move level froward backward respectively
 		mKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel+1);this.bgMusic.stop();},this);
-		if(this.currentLevel>1)
+		if(this.currentLevel>1){	//only move back a level if not on level 1
 			nKey.onUp.add(function(){starCuts.game.state.start('Game',true,false, this.currentLevel-1);this.bgMusic.stop();},this);
+		}
+		//allows invinicbility key (I) to make player invincible. Makes a visible change to sprites
 		invincibleTimer=(invincibleTimer>0)?invincibleTimer-1:-1;
 		if(invincibleTimer<=0)
-			spacebar.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
+			invincibilityKey.onUp.add(function(){if(invincibleTimer<=0){isInvincible=!isInvincible;};invincibleTimer=50},this);
 		if(isInvincible)
 			this.lineGroup.alpha=0.5;
 		else
 			this.lineGroup.alpha=1;
 		
-		
+		//adds event handler for level restarting on lose/win
 		if(gameOver){
 			this.game.input.onDown.add(this.restart,this);
-
 			return;
 		}
         //  Collide the player with the platforms
-        //this.game.physics.arcade.collide(this.player, this.ground, this.playerHit, null, this);
         this.hitPlatform = this.game.physics.arcade.collide(this.player, this.ground);
 		//	Collide player with people in line
-		if(!isInvincible)
+		if(!isInvincible){
 			this.game.physics.arcade.overlap(this.player, this.lineGroup, this.hitPatron, null, this);
+		}
 
         //Animation controls for player
-        if (/*this.player.body.touching.down && */this.hitPlatform) {
+        if (this.hitPlatform) {
             //  Reset the players velocity if they're touching ground
             this.player.body.velocity.x = 0;
-            //this.player.animations.stop();
             hasJumped = false;
             hasnudged = false;
             if (!hasJumped && !this.game.input.mousePointer.isDown && this.player.x != 250) {
                 this.player.animations.stop();
-                console.log("Land Animation");
                 this.player.frame = 0;
             } else if (!this.game.input.mousePointer.isDown) {
                 this.player.animations.stop();
@@ -245,37 +221,33 @@ starCuts.Game.prototype = {
             } else if (this.game.input.mousePointer.isDown) {
                 //this.player.animations.play('crouch');
             }
-
         }
-
-        if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x >= startWinX && this.player.x - this.game.camera.x <= endWinX) {
+		//defines the win condition, get to the end of the stage
+        if (this.hitPlatform && !gameOver && this.player.x - this.game.camera.x >= startWinX && this.player.x - this.game.camera.x <= endWinX) {
             this.hasWon();
         }
-        if (/*this.player.body.touching.down && */this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
+		//defiens an unused loose condition
+        if (this.hitPlatform && !gameOver && this.player.x - this.game.camera.x > endWinX) {
             this.hitPatron(this.player, null,loseTextArray["OutOfBounds"]);
         }
-
-
-
-
+		
+		//calls checkLand if the player has just landed
         if (this.hitPlatform) {
             var hasLost = false;
             hasLanded = true;
 			if(!isInvincible){
 				this.checkLand();
 			}
-
         }
 
-
+		//iterates over all enemies
         for (var x = 0; x < this.lineGroup.length; x++){
-
         	//Pacing guy
-			if (this.lineGroup.children[x].key === "pacingguy")
-        	this.lineGroup.children[x].ai();
-		
-			//Tossing guy
-			if(this.lineGroup.children[x].key === "tossingguy"){
+			if (this.lineGroup.children[x].key === "pacingguy"){
+				this.lineGroup.children[x].ai();
+			}
+			//TossingGuy
+			else if(this.lineGroup.children[x].key === "tossingguy"){
 				var tmpTossingGuy=this.lineGroup.children[x];
 				if(tmpTossingGuy.isThrowing && tmpTossingGuy.phone.body.y>(this.game.height - 110)){
 					tmpTossingGuy.isThrowing=false;
@@ -284,40 +256,29 @@ starCuts.Game.prototype = {
 					tmpTossingGuy.phone.body.velocity.y=0;
 					tmpTossingGuy.phone.body.gravity.y=0;
 				}
-				if(!isInvincible)
-					this.game.physics.arcade.overlap(this.player, tmpTossingGuy.phone, this.hitPatron, null, this);
+				if(!isInvincible){
+					this.game.physics.arcade.overlap(this.player, tmpTossingGuy.phone, function(){this.hitPatron(this.player,tmpTossingGuy.phone,loseTextArray["TossingGuy"]);},null, this);
+				}
 			}
 		}
-
-
     },
 
-
+	//checks if the player is safe where they landed
     checkLand: function() {
-
+		//isChecking is false if the player has landed and this function has yet to be called
         if(!isChecking) {
 			var xValue = this.player.x;
 			isChecking = true;
 			for(var i=0;i<lossPositions.length;i++){
 				x=lossPositions[i];
 				if(x[0]<=xValue && x[1]>xValue){
-					console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
+					//console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
 					this.hitPatron(this.player,null,loseTextArray["PhoneGuy"]);
 				}
 			}
-			/*
-			//assumed phone guy was always first and assumed there was always one enemy, generalized above
-			//var isLooking = new Boolean(this.lineGroup.children[0].lookUp);
-            if((isLooking.valueOf() == true) && (lossPositions[0][0] <= xValue && xValue < lossPositions[0][1])) {
-                //console.log("Look:" + isLooking.toString() + " x:" + xValue);
-                console.log(lossPositions[0][0] + " < x < " + lossPositions[0][1]);
-                this.hitPatron(this.player,null);
-            }
-			*/
         }
-
     },
-
+	//When the player finished dragging, jump
     onDragStop: function(sprite, pointer) {
         lineDrawer.clear();
         var xdiff = sprite.position.x - (pointer.x+this.game.camera.x);
@@ -330,9 +291,11 @@ starCuts.Game.prototype = {
 		this.jumpSound.play();
 		isChecking = false;
     },
+	//Displays arrow aprroximately proportional to player's launch velocity
     onDragUpdate: function (sprite,pointer) {
         //TODO Add triangle to top of line to form arrow, then add angle calculations
         lineDrawer.clear();
+		//Only draw the arrow if the player is touching the ground
         if(this.hitPlatform) {
             lineDrawer.beginFill(0x21922C);
             lineDrawer.lineStyle(7, 0x21922C, 1);
@@ -343,9 +306,8 @@ starCuts.Game.prototype = {
             var yThreshhold = (ydiff / Math.abs(ydiff)) * Math.min(10 * Math.abs(ydiff), 1200);
             lineDrawer.lineTo(sprite.x + xdiff * 4, sprite.y + ydiff * 4);
         }
-
-
     },
+	//fills lineGroup with the enemies it is to contain
     generateLevelArray: function (array, offsetFromLeft, distFromEachCell) {
         //TODO Perform checks to determine if array can actually be loaded, or if it wont fit on screen, etc
         for (var i = 0; i < array.length; i++) {
@@ -387,31 +349,28 @@ starCuts.Game.prototype = {
 
     },
 
-
+	//sets up each phoneGuy's timer loop for checing their phone
     phoneGuyAnimationController: function(phoneGuy,delay,lineNumber) {
         timer = this.game.time.create();
-
         timer.loop(delay * 200 * this.game.rnd.integerInRange(4,9),this.phoneGuyTimerFunction,this,phoneGuy,phoneGuy.x,lineNumber);
         timer.start();
     },
 
-
+	//called whe phoneguy switches between checking and not checking his phone
     phoneGuyTimerFunction: function (phoneGuy,xPosition,lineNumber) {
         if(phoneGuy.lookUp) {
             phoneGuy.animations.play('lookAtPhone',false);
-            //lossPositions[lineNumber] = [xPosition, xPosition + 300];
 			lossPositions[lineNumber] = [0,0];
         }
 
         else {
             phoneGuy.animations.play('lookAhead',false);
-            //lossPositions[lineNumber] = [0,0];
 			lossPositions[lineNumber] = [xPosition, xPosition + 300];
         }
         phoneGuy.lookUp = !phoneGuy.lookUp;
 
     },
-
+	//sets up pacingGuys properties, start location, end location and speed
     pacingGuyAnimationController: function(pacingGuy,speed,endX) {
 
         pacingGuy.startX = pacingGuy.x;
@@ -420,32 +379,27 @@ starCuts.Game.prototype = {
         pacingGuy.body.velocity.x = 100;
 
     },
-
-
-
+	//sets up tossingGuy's timer loop for throwing his phone
     tossingGuyAnimationController: function(tossingGuy,delay) {
 		timer = this.game.time.create();
         timer.loop(delay * 1000,this.tossingGuyTimerFunction,this,tossingGuy);
         timer.start();
     },
+	//called every time tossingGuy tosses his phone
 	tossingGuyTimerFunction: function (tossingGuy){
 		if(!tossingGuy.isThrowing){
 			tossingGuy.animations.play('full');
 			tossingGuy.isThrowing=true;
 			tossingGuy.phone.body.gravity.y = 1300;
-			//tossingGuy.phone.body.collideWorldBounds = true;
 			tossingGuy.phone.body.velocity.y=-1200;
 		}
 		
 	},
 
-
-
-
     generateLineObjectAnimation: function (lineGroup) {
         var numPhoneGuys = 0;
         for ( var i = 0; i < lineGroup.length; i++) {
-
+			//adds each phoneguy's animations and sets up their timer loop
             if(lineGroup.children[i].key === 'phoneguy') {
 
                 lineGroup.children[i].animations.add('lookAtPhone', [0,1,2,3,4,5,6],9,false);
@@ -454,14 +408,11 @@ starCuts.Game.prototype = {
                 this.phoneGuyAnimationController(lineGroup.children[i],5,numPhoneGuys);
                 numPhoneGuys += 1;
             }
-
+			//adds each pacingGuy's animations and sets their properties for where they walk
             else if(lineGroup.children[i].key === 'pacingguy') {
-
-
                 lineGroup.children[i].animations.add('walkLeft', [6,7,8,9,10,11],12,true);
                 lineGroup.children[i].animations.add('walkRight', [0,1,2,3,4,5],12,true);
                 this.pacingGuyAnimationController(lineGroup.children[i],10,lineGroup.children[i+1].x); // Pacing guy cannot be last guy
-				console.log(lineGroup.children[i]);
 				lineGroup.children[i].ai = function(){
 
 					if ( (this.x < this.startX) || (this.x > this.endX)) {
@@ -478,7 +429,7 @@ starCuts.Game.prototype = {
 				}
 
             }
-
+			//adds each tossingGuy's animations and sets up their throwing timer
             else if(lineGroup.children[i].key === 'tossingguy') {
 
                 lineGroup.children[i].animations.add('tossup', [0,1,2,3,4,5,6]);
@@ -501,10 +452,7 @@ starCuts.Game.prototype = {
             }
         }
     },
-
-
-
-
+	//returns the 'index'th enemie in LineGroup
     getLineElmtX: function(LineGroup, index) { // Currently returns the x coord at which the sprite begins
         //TODO add the pixel width of the sprite to get the x coord at which the sprite ends
         var lineElement = LineGroup.children[index];
@@ -512,9 +460,9 @@ starCuts.Game.prototype = {
 
         return position;
     },
+	//Called when the player has encountered a lose condition
 	hitPatron: function(player, patron, text){
 		console.log("you lose");
-
 		if(!text) {
             text = loseTextArray["Collision"];
         }
@@ -531,6 +479,7 @@ starCuts.Game.prototype = {
 		gameOver=true;
 
 	},
+	//restarts the current level is lost or starts the next levl if won
 	restart: function(self){
         this.game.physics.arcade.isPaused=false;
 		goToLevel=gameWon?this.currentLevel+1:this.currentLevel;
@@ -540,6 +489,7 @@ starCuts.Game.prototype = {
 		hasJumped=false;
 		starCuts.game.state.start('Game',true,false, goToLevel);
 	},
+	//pauses physics adds congratulatory text and displays a winning animation/sound
 	hasWon: function(){
 		console.log("you win");
 		this.coffee = this.game.add.sprite(this.player.x - 42, this.player.y - 130, 'coffee');
@@ -557,9 +507,11 @@ starCuts.Game.prototype = {
 		this.winSound.play();
 		
 	},
+	//plays the crouching animation when a drag has started
 	onDragStart:function(sprite,pointer){
 		this.player.animations.play('crouch');
 	},
+	//adds decorative lamps at startup
 	drawLamps:function(distToNext, leftOffset){
 		for(var i=0; i<=(worldBound-leftOffset)/distToNext;i++){
 			if(i%2===0)
@@ -568,8 +520,7 @@ starCuts.Game.prototype = {
 				this.game.add.sprite(leftOffset+(i*distToNext), -40, 'topLamp');
 		}
 	},
-
-
+	//provides a menu while in a level
     inGameMenu: function(){
 	    inGameMenu = this.game.add.sprite(10, 60 , 'menu');
         inGameMenu.fixedToCamera = true;
@@ -582,7 +533,7 @@ starCuts.Game.prototype = {
             this.alpha = 0.8;
         }, inGameMenu);
 
-
+		//scary stuff in here
         inGameMenu.events.onInputDown.add(function(){
             menu = this.game.add.sprite(this.game.width/2, this.game.height/2,'pause menu');
             menu.anchor.setTo(0.5,0.5);
@@ -639,27 +590,26 @@ starCuts.Game.prototype = {
         }, this);
 
     },
+	//allows the player to nudge themselves once per jump
     nudge: function() {
-
         if(!this.hitPlatform && !hasnudged) {
             hasnudged = true;
             var velocityOffset = 100;
             if (this.player.x - this.game.camera.x >  this.game.input.x) {
-                console.log("The Player's X is > the mouse move forward Player X:" + this.player.x + "Mouse X" + this.game.input.x);
+                //console.log("The Player's X is > the mouse move forward Player X:" + this.player.x + "Mouse X" + this.game.input.x);
                 this.player.body.velocity.x = this.player.body.velocity.x* 0.5 + velocityOffset;
                 this.player.body.velocity.y = -500;
 
             }
             else {
-                console.log("The Player's X is < than the mouse, move back Player X:" + this.player.x + "Mouse X" + this.game.input.x);
+                //console.log("The Player's X is < than the mouse, move back Player X:" + this.player.x + "Mouse X" + this.game.input.x);
                 this.player.body.velocity.x = 0 - velocityOffset;
                 this.player.body.velocity.y = -500;
             }
 
-        }
-
+        }/*
         else {
             console.log("Hitting the platform, cannot nudge");
-        }
+        }*/
     }
 };
